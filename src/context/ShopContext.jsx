@@ -7,8 +7,8 @@ export const ShopContext = createContext();
 const ShopContextProvider = (props) => {
   const currency = "$";
   const delivery_fee = 10;
-  const[search, setSearch] = useState("");
-  const[showSearch, setShowSearch] = useState(true);
+  const [search, setSearch] = useState("");
+  const [showSearch, setShowSearch] = useState(false);
 
   const value = {
     products,
@@ -17,7 +17,7 @@ const ShopContextProvider = (props) => {
     search,
     setSearch,
     showSearch,
-    setShowSearch
+    setShowSearch,
   };
 
   return (

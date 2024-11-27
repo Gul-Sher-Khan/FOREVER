@@ -2,10 +2,12 @@ import { useState } from "react";
 import PropTypes from "prop-types";
 import { assets } from "../assets/assets";
 import { Link, NavLink } from "react-router-dom";
+import { useContext } from "react";
+import { ShopContext } from "../context/ShopContext";
 
 const Navbar = ({ setMenuOpen }) => {
   const [visible, setVisible] = useState(false);
-
+  const { setShowSearch } = useContext(ShopContext);
   const handleMenuToggle = () => {
     setVisible(!visible);
     setMenuOpen(visible); // Inform App of menu state
@@ -35,7 +37,12 @@ const Navbar = ({ setMenuOpen }) => {
         </NavLink>
       </ul>
       <div className="flex items-center gap-6">
-        <img src={assets.search_icon} className="w-5 cursor-pointer" alt="" />
+        <img
+          onClick={() => setShowSearch(true)}
+          src={assets.search_icon}
+          className="w-5 cursor-pointer"
+          alt=""
+        />
         <div className="group relative">
           <img
             src={assets.profile_icon}
