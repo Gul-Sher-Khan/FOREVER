@@ -11,6 +11,7 @@ import Contact from "./pages/Contact";
 import Orders from "./pages/Orders";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
+import SearchBar from "./components/SearchBar";
 
 const App = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -22,6 +23,7 @@ const App = () => {
       }`}
     >
       <Navbar setMenuOpen={setMenuOpen} />
+      <SearchBar/>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/collection" element={<Collection />} />
