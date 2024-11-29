@@ -12,7 +12,8 @@ import Orders from "./pages/Orders";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import SearchBar from "./components/SearchBar";
-
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const App = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -22,8 +23,9 @@ const App = () => {
         menuOpen ? "opacity-90 pointer-events-none" : "opacity-100"
       }`}
     >
+      <ToastContainer />
       <Navbar setMenuOpen={setMenuOpen} />
-      <SearchBar/>
+      <SearchBar />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/collection" element={<Collection />} />
@@ -35,7 +37,7 @@ const App = () => {
         <Route path="/place-order" element={<PlaceOrder />} />
         <Route path="/orders" element={<Orders />} />
       </Routes>
-      <Footer/>
+      <Footer />
     </div>
   );
 };
