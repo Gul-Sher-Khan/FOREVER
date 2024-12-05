@@ -1,6 +1,6 @@
 import { useContext } from "react";
-import { ShopContext } from "../context/ShopContext";
-import Title from "../components/Title";
+import { ShopContext } from "../../context/ShopContext";
+import Title from "../../components/User/Title";
 
 const Orders = () => {
   const { products, currency } = useContext(ShopContext);

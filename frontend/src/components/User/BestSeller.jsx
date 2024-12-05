@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { ShopContext } from "../context/ShopContext"; // Adjust the import path as necessary
+import { ShopContext } from "../../context/ShopContext"; // Adjust the import path as necessary
 import Title from "./Title"; // Adjust the import path as necessary
 import ProductItem from "./ProductItem"; // Adjust the import path as necessary
 
@@ -21,7 +21,7 @@ const BestSeller = () => {
         </p>
       </div>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 gap-y-6">
-      {bestSeller.map((item, index) => (
+        {bestSeller.map((item, index) => (
           <ProductItem
             key={index}
             id={item._id}
