@@ -41,6 +41,13 @@ const Navbar = ({ setMenuOpen }) => {
           <p>CONTACT</p>
           <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
         </NavLink>
+        <NavLink
+          to="/user/wishlist"
+          className="flex flex-col items-center gap-1"
+        >
+          <p>WISHLIST</p>
+          <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
+        </NavLink>
       </ul>
       <div className="flex items-center gap-6">
         <img
@@ -60,7 +67,12 @@ const Navbar = ({ setMenuOpen }) => {
           </Link>
           <div className="group-hover:block hidden absolute dropdown-menu right-0 pt-4">
             <div className="flex flex-col gap-2 w-36 py-3 px-5 bg-slate-100 text-gray-500 rounded">
-              <p className="cursor-pointer hover:text-black">My Profile</p>
+              <NavLink
+                className="cursor-pointer hover:text-black"
+                to="/user/profile"
+              >
+                My Profile
+              </NavLink>
               <p className="cursor-pointer hover:text-black">Others</p>
               <p className="cursor-pointer hover:text-black">Logout</p>
             </div>
@@ -121,6 +133,13 @@ const Navbar = ({ setMenuOpen }) => {
             className="py-2 pl-6 border"
           >
             CONTACT
+          </NavLink>
+          <NavLink
+            to="/user/wishlist"
+            onClick={() => setVisible(false)}
+            className="py-2 pl-6 border"
+          >
+            WISHLIST
           </NavLink>
         </div>
       </div>

@@ -10,6 +10,8 @@ import Orders from "../pages/User/Orders";
 import Footer from "../components/Shared/Footer";
 import Navbar from "../components/Shared/Navbar";
 import SearchBar from "../components/User/SearchBar";
+import Wishlist from "../pages/User/Wishlist";
+import ProfileManagement from "../pages/User/ProfileManagement";
 
 const UserLayout = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -29,6 +31,8 @@ const UserLayout = () => {
         <Route path="/cart" element={<Cart />} />
         <Route path="/place-order" element={<PlaceOrder />} />
         <Route path="/orders" element={<Orders />} />
+        <Route path="/wishlist" element={<Wishlist />} />
+        <Route path="/profile" element={<ProfileManagement />} />
       </Routes>
       <Footer />
     </div>
