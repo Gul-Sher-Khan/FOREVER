@@ -1,19 +1,15 @@
 import { useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import Home from "./pages/User/Home";
-import About from "./pages/User/About";
-import Collection from "./pages/User/Collection";
-import PlaceOrder from "./pages/User/PlaceOrder";
-import Login from "./pages/User/Login";
-import Cart from "./pages/User/Cart";
-import Product from "./pages/User/Product";
-import Contact from "./pages/User/Contact";
-import Orders from "./pages/User/Orders";
 import Navbar from "./components/Shared/Navbar";
 import Footer from "./components/Shared/Footer";
+import Login from "./pages/User/Login";
 import SearchBar from "./components/User/SearchBar";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import VendorLayout from "./Layouts/VendorLayout";
+import AdminLayout from "./Layouts/AdminLayout";
+import UserLayout from "./Layouts/UserLayout";
 const App = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -24,20 +20,33 @@ const App = () => {
       }`}
     >
       <ToastContainer />
-      <Navbar setMenuOpen={setMenuOpen} />
-      <SearchBar />
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/collection" element={<Collection />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="/product/:productId" element={<Product />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/place-order" element={<PlaceOrder />} />
-        <Route path="/orders" element={<Orders />} />
+        <Route
+          path="/"
+          element={
+            <>
+              <Navbar setMenuOpen={setMenuOpen} />
+              <SearchBar />
+              <Home />
+              <Footer />
+            </>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <>
+              <Navbar setMenuOpen={setMenuOpen} />
+              <SearchBar />
+              <Login />
+              <Footer />
+            </>
+          }
+        />
+        <Route path="/admin/*" element={<AdminLayout />} />
+        <Route path="/vendor/*" element={<VendorLayout />} />
+        <Route path="/user/*" element={<UserLayout />} />
       </Routes>
-      <Footer />
     </div>
   );
 };

@@ -25,7 +25,7 @@ const NewsletterBox = () => {
           type="submit"
           className="bg-black text-white text-xs px-10 py-4"
         >
-          SIUUUBSCRIBE
+          SUBSCRIBE
         </button>
       </form>
     </div>

@@ -23,15 +23,21 @@ const Navbar = ({ setMenuOpen }) => {
           <p>HOME</p>
           <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
         </NavLink>
-        <NavLink to="/collection" className="flex flex-col items-center gap-1">
+        <NavLink
+          to="/user/collection"
+          className="flex flex-col items-center gap-1"
+        >
           <p>COLLECTION</p>
           <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
         </NavLink>
-        <NavLink to="/about" className="flex flex-col items-center gap-1">
+        <NavLink to="/user/about" className="flex flex-col items-center gap-1">
           <p>ABOUT</p>
           <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
         </NavLink>
-        <NavLink to="/contact" className="flex flex-col items-center gap-1">
+        <NavLink
+          to="/user/contact"
+          className="flex flex-col items-center gap-1"
+        >
           <p>CONTACT</p>
           <hr className="w-2/4 border-none h-[1.5px] bg-gray-700 hidden" />
         </NavLink>
@@ -60,7 +66,7 @@ const Navbar = ({ setMenuOpen }) => {
             </div>
           </div>
         </div>
-        <Link to="/cart" className="relative">
+        <Link to="/user/cart" className="relative">
           <img src={assets.cart_icon} className="w-5 min-w-5" alt="" />
           <p className="absolute right-[-5px] bottom-[-5px] w-4 text-center leading-4 bg-black text-white aspect-square rounded-full text-[8px]">
             {getCartCount()}
@@ -96,21 +102,21 @@ const Navbar = ({ setMenuOpen }) => {
             HOME
           </NavLink>
           <NavLink
-            to="/collection"
+            to="/user/collection"
             onClick={() => setVisible(false)}
             className="py-2 pl-6 border"
           >
             COLLECTION
           </NavLink>
           <NavLink
-            to="/about"
+            to="/user/about"
             onClick={() => setVisible(false)}
             className="py-2 pl-6 border"
           >
             ABOUT
           </NavLink>
           <NavLink
-            to="/contact"
+            to="/user/contact"
             onClick={() => setVisible(false)}
             className="py-2 pl-6 border"
           >
