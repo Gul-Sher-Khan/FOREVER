@@ -1,127 +1,213 @@
-import { useState } from "react";
+import React, { useState } from "react";
 
-const ProductUpload = ({ onProductUpload }) => {
-  const [product, setProduct] = useState({
+const ProductUpload = () => {
+  const [productData, setProductData] = useState({
     name: "",
+    category: "",
     price: "",
+    description: "",
     sizes: [],
     images: [],
   });
+
   const [sizeInput, setSizeInput] = useState("");
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setProduct({ ...product, [name]: value });
+    setProductData({ ...productData, [name]: value });
   };
 
   const handleAddSize = () => {
-    if (sizeInput) {
-      setProduct({ ...product, sizes: [...product.sizes, sizeInput] });
+    if (sizeInput && !productData.sizes.includes(sizeInput)) {
+      setProductData({
+        ...productData,
+        sizes: [...productData.sizes, sizeInput],
+      });
       setSizeInput("");
     }
   };
 
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
-    setProduct({
-      ...product,
-      images: [
-        ...product.images,
-        ...files.map((file) => URL.createObjectURL(file)),
-      ],
+    const imagePreviews = files.map((file) => URL.createObjectURL(file));
+    setProductData({
+      ...productData,
+      images: [...productData.images, ...imagePreviews],
     });
+  };
+
+  const handleRemoveImage = (index) => {
+    const updatedImages = productData.images.filter((_, i) => i !== index);
+    setProductData({ ...productData, images: updatedImages });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onProductUpload(product);
-    setProduct({ name: "", price: "", sizes: [], images: [] });
+    console.log("Submitted product data: ", productData);
+    // Clear form after submission
+    setProductData({
+      name: "",
+      category: "",
+      price: "",
+      description: "",
+      sizes: [],
+      images: [],
+    });
   };
 
   return (
-    <div className="p-6 sm:p-10 border-t">
-      <h1 className="text-2xl sm:text-3xl font-semibold text-gray-800 mb-6">
-        Product Upload
-      </h1>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label className="block text-sm text-gray-600 mb-1">Name</label>
-          <input
-            type="text"
-            name="name"
-            value={product.name}
-            onChange={handleInputChange}
-            className="w-full border-gray-300 rounded-md focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-            required
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-sm text-gray-600 mb-1">Price</label>
-          <input
-            type="number"
-            name="price"
-            value={product.price}
-            onChange={handleInputChange}
-            className="w-full border-gray-300 rounded-md focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-            required
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-sm text-gray-600 mb-1">Sizes</label>
-          <div className="flex items-center">
+    <div className="min-h-screen bg-gray-50 p-6 flex flex-col items-center">
+      <div className="w-full max-w-4xl bg-white shadow-lg rounded-lg p-8">
+        <h1 className="text-2xl font-semibold text-gray-800 mb-6">
+          Upload a New Product
+        </h1>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Product Name */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Product Name
+            </label>
             <input
               type="text"
-              value={sizeInput}
-              onChange={(e) => setSizeInput(e.target.value)}
-              className="w-full border-gray-300 rounded-md focus:ring focus:ring-blue-500 focus:ring-opacity-50 mr-2"
+              name="name"
+              value={productData.name}
+              onChange={handleInputChange}
+              className="w-full border border-gray-300 rounded-lg p-3 mt-1 focus:ring focus:ring-black focus:outline-none"
+              placeholder="Enter product name"
+              required
             />
+          </div>
+
+          {/* Category and Price */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Category
+              </label>
+              <select
+                name="category"
+                value={productData.category}
+                onChange={handleInputChange}
+                className="w-full border border-gray-300 rounded-lg p-3 mt-1 focus:ring focus:ring-black focus:outline-none"
+                required
+              >
+                <option value="" disabled>
+                  Select a category
+                </option>
+                <option value="Clothing">Clothing</option>
+                <option value="Electronics">Electronics</option>
+                <option value="Home Appliances">Home Appliances</option>
+                <option value="Accessories">Accessories</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Price ($)
+              </label>
+              <input
+                type="number"
+                name="price"
+                value={productData.price}
+                onChange={handleInputChange}
+                className="w-full border border-gray-300 rounded-lg p-3 mt-1 focus:ring focus:ring-black focus:outline-none"
+                placeholder="Enter price"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Description
+            </label>
+            <textarea
+              name="description"
+              value={productData.description}
+              onChange={handleInputChange}
+              className="w-full border border-gray-300 rounded-lg p-3 mt-1 focus:ring focus:ring-black focus:outline-none"
+              placeholder="Write a brief description"
+              rows={4}
+            />
+          </div>
+
+          {/* Sizes */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Available Sizes
+            </label>
+            <div className="flex items-center gap-4 mt-2">
+              <input
+                type="text"
+                value={sizeInput}
+                onChange={(e) => setSizeInput(e.target.value)}
+                className="flex-1 border border-gray-300 rounded-lg p-3 focus:ring focus:ring-black focus:outline-none"
+                placeholder="Add a size (e.g., S, M, L)"
+              />
+              <button
+                type="button"
+                onClick={handleAddSize}
+                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+              >
+                Add
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {productData.sizes.map((size, index) => (
+                <span
+                  key={index}
+                  className="bg-gray-100 text-gray-800 px-3 py-1 rounded-lg shadow"
+                >
+                  {size}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Image Upload */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Product Images
+            </label>
+            <div className="mt-2">
+              <input
+                type="file"
+                multiple
+                onChange={handleImageUpload}
+                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              />
+            </div>
+            <div className="grid grid-cols-3 gap-4 mt-4">
+              {productData.images.map((image, index) => (
+                <div key={index} className="relative">
+                  <img
+                    src={image}
+                    alt="Product"
+                    className="w-full h-24 object-cover rounded-lg"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveImage(index)}
+                    className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <div className="flex justify-end">
             <button
-              type="button"
-              onClick={handleAddSize}
-              className="bg-blue-500 text-white px-4 py-1 rounded-md hover:bg-blue-600"
+              type="submit"
+              className="bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600"
             >
-              Add
+              Upload Product
             </button>
           </div>
-          <div className="mt-2">
-            {product.sizes.map((size, index) => (
-              <span
-                key={index}
-                className="text-sm bg-gray-200 px-2 py-1 rounded-md mr-2"
-              >
-                {size}
-              </span>
-            ))}
-          </div>
-        </div>
-        <div className="mb-4">
-          <label className="block text-sm text-gray-600 mb-1">Images</label>
-          <input
-            type="file"
-            multiple
-            onChange={handleImageUpload}
-            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:text-sm file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-          />
-          <div className="mt-2 grid grid-cols-3 gap-4">
-            {product.images.map((image, index) => (
-              <img
-                key={index}
-                src={image}
-                alt="Preview"
-                className="w-full h-20 object-cover rounded-md"
-              />
-            ))}
-          </div>
-        </div>
-        <div className="flex justify-end">
-          <button
-            type="submit"
-            className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
-          >
-            Upload Product
-          </button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 };

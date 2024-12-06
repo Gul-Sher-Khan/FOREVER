@@ -11,12 +11,12 @@ import {
 import { FiMenu, FiX } from "react-icons/fi";
 
 const menuItems = [
-  { name: "Dashboard", icon: FaHome, path: "/" },
-  { name: "Product Upload", icon: FaTshirt, path: "/product-upload" },
-  { name: "Orders", icon: FaBox, path: "/orders" },
-  { name: "Analytics", icon: FaChartLine, path: "/analytics" },
-  { name: "Coupons", icon: FaTags, path: "/coupons" },
-  { name: "Messages", icon: FaEnvelope, path: "/messages" },
+  { name: "Dashboard", icon: FaHome, path: "/vendor/" },
+  { name: "Product Upload", icon: FaTshirt, path: "/vendor/product-upload" },
+  { name: "Orders", icon: FaBox, path: "/vendor/orders" },
+  { name: "Analytics", icon: FaChartLine, path: "/vendor/analytics" },
+  { name: "Coupons", icon: FaTags, path: "/vendor/coupons" },
+  { name: "Messages", icon: FaEnvelope, path: "/vendor/messages" },
 ];
 
 const Navbar = () => {

@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import ProductUpload from "../pages/Vendor/ProductUpload";
 import VendorRegistration from "../pages/Vendor/VendorRegistration";
 import Navbar from "../components/Vendor/Navbar";
+import Dashboard from "../pages/Vendor/Dashboard";
 
 const VendorLayout = () => {
   return (
@@ -13,10 +14,7 @@ const VendorLayout = () => {
       {/* Content Area */}
       <div className="flex-1 overflow-auto p-6">
         <Routes>
-          <Route
-            path="/"
-            element={<div>Welcome to the Vendor Dashboard</div>}
-          />
+          <Route path="/" element={<Dashboard />} />
           <Route path="/product-upload" element={<ProductUpload />} />
           <Route path="/register" element={<VendorRegistration />} />
         </Routes>
