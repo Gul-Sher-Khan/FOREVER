@@ -8,6 +8,7 @@ import Orders from "../pages/Vendor/Orders";
 import ManageInventory from "../pages/Vendor/Inventory";
 import AnalyticsPage from "../pages/Vendor/Analystics";
 import CouponsPromotions from "../pages/Vendor/CouponsPromotions";
+import Reviews from "../pages/Vendor/Reviews";
 
 const VendorLayout = () => {
   return (
@@ -25,6 +26,7 @@ const VendorLayout = () => {
           <Route path="/inventory" element={<ManageInventory />} />
           <Route path="/analytics" element={<AnalyticsPage />} />
           <Route path="/coupons" element={<CouponsPromotions />} />
+          <Route path="/messages" element={<Reviews />} />
         </Routes>
       </div>
     </div>
