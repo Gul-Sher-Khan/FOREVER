@@ -15,7 +15,7 @@ const App = () => {
 
   return (
     <div
-      className={`px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw] transition-opacity duration-300 ${
+      className={` transition-opacity duration-300 ${
         menuOpen ? "opacity-90 pointer-events-none" : "opacity-100"
       }`}
     >
@@ -24,12 +24,12 @@ const App = () => {
         <Route
           path="/"
           element={
-            <>
+            <div className="px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]">
               <Navbar setMenuOpen={setMenuOpen} />
               <SearchBar />
               <Home />
               <Footer />
-            </>
+            </div>
           }
         />
         <Route
