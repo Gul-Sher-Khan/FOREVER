@@ -5,6 +5,9 @@ import VendorRegistration from "../pages/Vendor/VendorRegistration";
 import Navbar from "../components/Vendor/Navbar";
 import Dashboard from "../pages/Vendor/Dashboard";
 import Orders from "../pages/Vendor/Orders";
+import ManageInventory from "../pages/Vendor/Inventory";
+import AnalyticsPage from "../pages/Vendor/Analystics";
+import CouponsPromotions from "../pages/Vendor/CouponsPromotions";
 
 const VendorLayout = () => {
   return (
@@ -19,6 +22,9 @@ const VendorLayout = () => {
           <Route path="/product-upload" element={<ProductUpload />} />
           <Route path="/register" element={<VendorRegistration />} />
           <Route path="/orders" element={<Orders />} />
+          <Route path="/inventory" element={<ManageInventory />} />
+          <Route path="/analytics" element={<AnalyticsPage />} />
+          <Route path="/coupons" element={<CouponsPromotions />} />
         </Routes>
       </div>
     </div>
