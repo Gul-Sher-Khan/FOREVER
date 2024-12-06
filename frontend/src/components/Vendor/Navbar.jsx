@@ -7,6 +7,7 @@ import {
   FaChartLine,
   FaTags,
   FaEnvelope,
+  FaIndustry,
 } from "react-icons/fa";
 import { FiMenu, FiX } from "react-icons/fi";
 
@@ -14,6 +15,7 @@ const menuItems = [
   { name: "Dashboard", icon: FaHome, path: "/vendor/" },
   { name: "Product Upload", icon: FaTshirt, path: "/vendor/product-upload" },
   { name: "Orders", icon: FaBox, path: "/vendor/orders" },
+  { name: "Inventory", icon: FaIndustry, path: "/vendor/inventory" },
   { name: "Analytics", icon: FaChartLine, path: "/vendor/analytics" },
   { name: "Coupons", icon: FaTags, path: "/vendor/coupons" },
   { name: "Messages", icon: FaEnvelope, path: "/vendor/messages" },

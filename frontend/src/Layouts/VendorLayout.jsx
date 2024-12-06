@@ -4,6 +4,7 @@ import ProductUpload from "../pages/Vendor/ProductUpload";
 import VendorRegistration from "../pages/Vendor/VendorRegistration";
 import Navbar from "../components/Vendor/Navbar";
 import Dashboard from "../pages/Vendor/Dashboard";
+import Orders from "../pages/Vendor/Orders";
 
 const VendorLayout = () => {
   return (
@@ -17,6 +18,7 @@ const VendorLayout = () => {
           <Route path="/" element={<Dashboard />} />
           <Route path="/product-upload" element={<ProductUpload />} />
           <Route path="/register" element={<VendorRegistration />} />
+          <Route path="/orders" element={<Orders />} />
         </Routes>
       </div>
     </div>
