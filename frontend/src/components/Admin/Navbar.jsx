@@ -22,7 +22,6 @@ const menuItems = [
   },
   { name: "Analytics", icon: FaChartLine, path: "/admin/analytics" },
   { name: "Feedback", icon: FaEnvelope, path: "/admin/feedback" },
-  { name: "Reports", icon: FaThList, path: "/admin/reports" },
 ];
 
 const AdminNavbar = () => {
