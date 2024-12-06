@@ -3,6 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import Navbar from "../components/Admin/Navbar";
 import Dashboard from "../pages/Admin/Dashboard";
 import UserVendorManagement from "../pages/Admin/UserVendorManagement";
+import ProductApproval from "../pages/Admin/ProductsApproval";
 
 const AdminLayout = () => {
   return (
@@ -11,6 +12,7 @@ const AdminLayout = () => {
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/manage-users" element={<UserVendorManagement />} />
+        <Route path="/product-approvals" element={<ProductApproval />} />
       </Routes>
     </div>
   );
