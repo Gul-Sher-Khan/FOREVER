@@ -58,7 +58,7 @@ import logo from "./logo.png";
 import hero_img from "./hero_img.png";
 import deals_img from "./deals_img.jpg";
 import best_img from "./best_img.jpg";
-import winter_img from "./winter_img.jpg"
+import winter_img from "./winter_img.jpg";
 import cart_icon from "./cart_icon.png";
 import bin_icon from "./bin_icon.png";
 import dropdown_icon from "./dropdown_icon.png";

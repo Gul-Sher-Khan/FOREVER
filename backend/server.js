@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import connectDB from "./config/mongodb.js";
-import connectCloudnary from './config/cloudinary.js';
+import connectCloudnary from "./config/cloudinary.js";
 import userRouter from "./routes/userRoute.js";
 import productRouter from "./routes/productRoute.js";
 // Load environment variables
@@ -24,12 +24,17 @@ app.use(express.json());
 app.use(cors());
 
 //Api Endpoints
-app.use('/api/user',userRouter);
-app.use('/api/product',productRouter);
+app.use("/api/user", userRouter);
+app.use("/api/product", productRouter);
 
 // API Routes
 app.get("/", (_req, res) => {
   res.send("API is working!");
+});
+
+//error handling middleware
+app.use((err, req, res, next) => {
+  res.status(500).send({ message: err.message });
 });
 
 // Start the server
