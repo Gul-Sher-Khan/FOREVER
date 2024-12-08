@@ -42,11 +42,7 @@ const Cart = () => {
               className="text-gray-700 grid grid-cols-[4fr_0.5fr_0.5fr] sm:grid-cols-[4fr_2fr_0.5fr]  border-t border-b py-4 items-center gap-4"
             >
               <div className="flex items-start gap-6">
-                <img
-                  className="w-16 sm:w-20"
-                  src={productData.image[0]}
-                  alt=""
-                />
+                <img className="w-16 sm:w-20" src={productData.image} alt="" />
                 <div>
                   <p className="text-xs sm:text-lg font-medium">
                     {productData.name}

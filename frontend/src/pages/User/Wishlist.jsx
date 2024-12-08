@@ -1,20 +1,38 @@
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { ShopContext } from "../../context/ShopContext";
 import Title from "../../components/User/Title";
 import ProductItem from "../../components/User/ProductItem";
 import { products } from "../../assets/assets";
+import axiosInstance from "../../Utils/axiosInstance";
 
 const Wishlist = () => {
-  const wishlist = products.slice(0, 3).map((product, index) => ({
-    id: product._id,
-    image: product.image,
-    name: product.name,
-    price: product.price,
-  }));
+  const [wishlist, setWishlist] = useState([]);
+
+  const getProducts = () => {
+    axiosInstance.get("/wishlist").then(
+      (res) => {
+        setWishlist(res.data.products);
+      },
+      (error) => {
+        console.error(error);
+      }
+    );
+  };
 
   const removeFromWishlist = (id) => {
-    console.log(`Remove item with id: ${id}`);
+    axiosInstance.patch("/wishlist/remove", { productId: id }).then(
+      (res) => {
+        getProducts();
+      },
+      (error) => {
+        console.error(error);
+      }
+    );
   };
+
+  useEffect(() => {
+    getProducts();
+  }, []);
 
   return (
     <div className="pt-10 border-t">
@@ -29,14 +47,14 @@ const Wishlist = () => {
           wishlist.map((item) => (
             <div key={item.id} className="relative">
               <ProductItem
-                id={item.id}
+                id={item._id}
                 image={item.image}
                 name={item.name}
                 price={item.price}
               />
               {/* Remove Button */}
               <button
-                onClick={() => removeFromWishlist(item.id)}
+                onClick={() => removeFromWishlist(item._id)}
                 className="absolute top-2 right-2 bg-red-500 text-white rounded-full px-2 py-1 text-xs"
               >
                 Remove

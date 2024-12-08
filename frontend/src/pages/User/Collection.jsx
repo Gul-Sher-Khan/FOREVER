@@ -6,22 +6,12 @@ import ProductItem from "../../components/User/ProductItem";
 import axiosInstance from "../../Utils/axiosInstance";
 
 const Collection = () => {
-  const { products, setProducts, search, showSearch } = useContext(ShopContext);
+  const { products, search, showSearch } = useContext(ShopContext);
   const [showFilter, setShowFilter] = useState(false);
   const [filterProducts, setFilterProducts] = useState([]);
   const [category, setCategory] = useState([]);
   const [subCategory, setSubCategory] = useState([]);
   const [sortType, setSortType] = useState("relavent");
-
-  const getProducts = async () => {
-    try {
-      axiosInstance.get("/products").then((res) => {
-        setProducts(res.data);
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   // made toogle function for category
   const toggleCategory = (e) => {
@@ -77,10 +67,6 @@ const Collection = () => {
         break;
     }
   };
-
-  useEffect(() => {
-    getProducts();
-  }, []);
 
   useEffect(() => {
     if (products.length > 0) {

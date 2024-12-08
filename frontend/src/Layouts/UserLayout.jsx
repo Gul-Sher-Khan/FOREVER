@@ -12,9 +12,30 @@ import Navbar from "../components/Shared/Navbar";
 import SearchBar from "../components/User/SearchBar";
 import Wishlist from "../pages/User/Wishlist";
 import ProfileManagement from "../pages/User/ProfileManagement";
+import { useEffect } from "react";
+import { useContext } from "react";
+import { ShopContext } from "../context/ShopContext";
+import axiosInstance from "../Utils/axiosInstance";
 
 const UserLayout = () => {
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const { setProducts } = useContext(ShopContext);
+
+  const getProducts = async () => {
+    try {
+      axiosInstance.get("/products").then((res) => {
+        setProducts(res.data);
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    getProducts();
+  }, []);
+
   return (
     <div
       className={`px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw] transition-opacity duration-300 ${

@@ -1,6 +1,7 @@
 const express = require("express");
 const connectDB = require("./config/db.js");
 const cors = require("cors");
+const { requireAuth } = require("./middleware/auth.js");
 require("dotenv").config();
 
 const app = express();
@@ -9,7 +10,7 @@ app.use(express.json());
 app.use(
   cors({
     origin: "http://localhost:5173",
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     credentials: true,
   })
 );
@@ -21,6 +22,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", require("./routes/authRouter"));
 app.use("/api/products", require("./routes/productRouter"));
 app.use("/api/orders", require("./routes/orderRouter"));
+app.use("/api/wishlist", requireAuth, require("./routes/wishlistRouter"));
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
