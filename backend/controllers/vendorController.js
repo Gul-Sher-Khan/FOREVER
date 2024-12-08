@@ -4,6 +4,7 @@ const Review = require("../models/Review");
 const moment = require("moment");
 const Product = require("../models/Product");
 const mongoose = require("mongoose");
+const Offer = require("../models/Offer");
 
 // Get Vendor Dashboard Data
 exports.getDashboardData = async (req, res) => {
@@ -390,5 +391,104 @@ exports.getAnalyticsData = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error fetching analytics data." });
+  }
+};
+
+// Get all offers for a specific store
+exports.getOffers = async (req, res) => {
+  const vendorId = req.user._id;
+
+  // Find the store owned by the vendor
+  const storeId = await Store.findOne({ owner: vendorId });
+
+  try {
+    const offers = await Offer.find({ store: storeId }).sort({
+      createdAt: -1,
+    });
+    res.json(offers);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Create a new offer
+exports.createOffer = async (req, res) => {
+  let { name, description, discount, exp_date, status } = req.body;
+
+  console.log(req.body);
+
+  try {
+    const owner = req.user._id;
+
+    // Find the store owned by the vendor
+    const store = await Store.findOne({
+      owner,
+    });
+
+    // Convert discount to number if it's a string
+    discount = Number(discount);
+
+    // Parse the exp_date string into a Date object
+    exp_date = new Date(exp_date);
+
+    // Create a new offer with the correct data
+    const newOffer = new Offer({
+      name,
+      desc: description,
+      percent: discount, // Assign the discount to percent
+      exp_date,
+      store: store._id,
+      status,
+    });
+
+    const offer = await newOffer.save();
+    res.status(201).json(offer);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+// Update an existing offer
+exports.updateOffer = async (req, res) => {
+  let { name, description, discount, exp_date, status } = req.body;
+
+  try {
+    const offer = await Offer.findById(req.params.id);
+
+    if (!offer) {
+      return res.status(404).json({ message: "Offer not found" });
+    }
+
+    // Convert discount to number if it's a string
+    discount = discount ? Number(discount) : offer.percent;
+
+    // Parse the exp_date string into a Date object if it exists
+    exp_date = exp_date ? new Date(exp_date) : offer.exp_date;
+
+    // Update the offer fields
+    offer.name = name || offer.name;
+    offer.desc = description || offer.desc; // description used here
+    offer.percent = discount; // percent field
+    offer.exp_date = exp_date;
+    offer.status = status || offer.status;
+
+    const updatedOffer = await offer.save();
+    res.json(updatedOffer);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+// Delete an offer
+exports.deleteOffer = async (req, res) => {
+  try {
+    const offer = await Offer.findByIdAndDelete(req.params.id);
+
+    if (!offer) {
+      return res.status(404).json({ message: "Offer not found" });
+    }
+
+    res.json({ message: "Offer deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };

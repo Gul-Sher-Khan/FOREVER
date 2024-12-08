@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Modal from "react-modal";
 import {
   FaTag,
@@ -9,6 +9,7 @@ import {
 } from "react-icons/fa";
 import { BsClockHistory } from "react-icons/bs";
 import { FiCheckCircle } from "react-icons/fi";
+import axiosInstance from "../../Utils/axiosInstance";
 
 // Modal configuration
 Modal.setAppElement("#root");
@@ -27,28 +28,23 @@ const modalStyles = {
 };
 
 const CouponsPromotions = () => {
-  const [coupons, setCoupons] = useState([
-    {
-      id: 1,
-      code: "SUMMER20",
-      discount: "20%",
-      description: "Summer Sale Discount",
-      active: true,
-      expiry: "2024-12-31",
-    },
-    {
-      id: 2,
-      code: "FREESHIP",
-      discount: "Free Shipping",
-      description: "Free shipping on all orders",
-      active: false,
-      expiry: "2024-11-30",
-    },
-  ]);
-
+  const [coupons, setCoupons] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState("create"); // 'create' or 'edit'
   const [currentCoupon, setCurrentCoupon] = useState(null);
+
+  useEffect(() => {
+    // Fetch coupons when component mounts
+    const fetchCoupons = async () => {
+      try {
+        const response = await axiosInstance.get("/vendor/offers");
+        setCoupons(response.data);
+      } catch (error) {
+        console.error("Error fetching coupons:", error);
+      }
+    };
+    fetchCoupons();
+  }, []);
 
   // Open Modal
   const openModal = (type, coupon = null) => {
@@ -64,31 +60,45 @@ const CouponsPromotions = () => {
   };
 
   // Handle Save
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const couponData = {
-      id: currentCoupon ? currentCoupon.id : Date.now(),
-      code: formData.get("code"),
+      name: formData.get("code"),
       discount: formData.get("discount"),
       description: formData.get("description"),
-      expiry: formData.get("expiry"),
-      active: formData.get("active") === "on",
+      exp_date: formData.get("expiry"),
+      status: formData.get("active") === "on" ? "active" : "inactive",
     };
 
-    if (modalType === "create") {
-      setCoupons([...coupons, couponData]);
-    } else {
-      setCoupons(coupons.map((c) => (c.id === couponData.id ? couponData : c)));
+    try {
+      if (modalType === "create") {
+        const response = await axiosInstance.post("/vendor/offers", couponData);
+        setCoupons([...coupons, response.data]);
+      } else {
+        const response = await axiosInstance.put(
+          `/vendor/offers/${currentCoupon._id}`,
+          couponData
+        );
+        setCoupons(
+          coupons.map((c) => (c.id === response.data.id ? response.data : c))
+        );
+      }
+      closeModal();
+    } catch (error) {
+      console.error("Error saving coupon:", error);
     }
-
-    closeModal();
   };
 
   // Delete Coupon
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this coupon?")) {
-      setCoupons(coupons.filter((c) => c.id !== id));
+      try {
+        await axiosInstance.delete(`/vendor/offers/${id}`);
+        setCoupons(coupons.filter((c) => c._id !== id));
+      } catch (error) {
+        console.error("Error deleting coupon:", error);
+      }
     }
   };
 
@@ -118,36 +128,38 @@ const CouponsPromotions = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {coupons.map((coupon) => (
           <div
-            key={coupon.id}
+            key={coupon._id}
             className={`relative bg-white shadow-lg rounded-lg p-6 border-l-4 ${
-              coupon.active ? "border-green-500" : "border-gray-300"
+              coupon.status === "active"
+                ? "border-green-500"
+                : "border-gray-300"
             }`}
           >
             <div className="flex justify-between items-center">
               <h2 className="text-xl font-bold text-gray-800 flex items-center">
                 <FaTag className="mr-2 text-gray-500" />
-                {coupon.code}
+                {coupon.name}
               </h2>
               <div
                 className={`text-sm font-medium ${
                   coupon.active ? "text-green-500" : "text-gray-400"
                 }`}
               >
-                {coupon.active ? (
+                {coupon.status === "active" ? (
                   <FiCheckCircle className="inline mr-1" />
                 ) : (
                   <BsClockHistory className="inline mr-1" />
                 )}
-                {coupon.active ? "Active" : "Inactive"}
+                {coupon.status === "active" ? "Active" : "Inactive"}
               </div>
             </div>
-            <p className="text-sm text-gray-500 mt-2">{coupon.description}</p>
+            <p className="text-sm text-gray-500 mt-2">{coupon.desc}</p>
             <p className="text-lg font-bold text-blue-600 mt-4">
               {coupon.discount}
             </p>
             <p className="text-sm text-gray-500 flex items-center mt-1">
               <FaCalendarAlt className="mr-2" />
-              Expires: {coupon.expiry}
+              Expires: {new Date(coupon.exp_date).toLocaleDateString()}
             </p>
             {/* Action Buttons */}
             <div className="flex justify-end mt-4 gap-3">
@@ -158,7 +170,7 @@ const CouponsPromotions = () => {
                 <FaEdit className="text-lg" />
               </button>
               <button
-                onClick={() => handleDelete(coupon.id)}
+                onClick={() => handleDelete(coupon._id)}
                 className="text-red-500 hover:text-red-700"
               >
                 <FaTrashAlt className="text-lg" />
@@ -178,6 +190,7 @@ const CouponsPromotions = () => {
           {modalType === "create" ? "Create New Promotion" : "Edit Promotion"}
         </h2>
         <form onSubmit={handleSave}>
+          {/* Form Fields */}
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700">
               Code
@@ -185,7 +198,7 @@ const CouponsPromotions = () => {
             <input
               type="text"
               name="code"
-              defaultValue={currentCoupon?.code || ""}
+              defaultValue={currentCoupon?.name || ""}
               className="w-full border border-gray-300 rounded-lg p-3"
               required
             />
@@ -197,7 +210,7 @@ const CouponsPromotions = () => {
             <input
               type="text"
               name="discount"
-              defaultValue={currentCoupon?.discount || ""}
+              defaultValue={currentCoupon?.percent || ""}
               className="w-full border border-gray-300 rounded-lg p-3"
               required
             />
@@ -208,7 +221,7 @@ const CouponsPromotions = () => {
             </label>
             <textarea
               name="description"
-              defaultValue={currentCoupon?.description || ""}
+              defaultValue={currentCoupon?.desc || ""}
               className="w-full border border-gray-300 rounded-lg p-3"
               rows="3"
               required
@@ -221,7 +234,11 @@ const CouponsPromotions = () => {
             <input
               type="date"
               name="expiry"
-              defaultValue={currentCoupon?.expiry || ""}
+              defaultValue={
+                currentCoupon?.exp_date
+                  ? new Date(currentCoupon?.exp_date).toLocaleString()
+                  : ""
+              }
               className="w-full border border-gray-300 rounded-lg p-3"
               required
             />
@@ -230,7 +247,7 @@ const CouponsPromotions = () => {
             <input
               type="checkbox"
               name="active"
-              defaultChecked={currentCoupon?.active || false}
+              defaultChecked={currentCoupon?.status === "active" ? true : false}
               className="h-5 w-5"
             />
             <label className="text-sm text-gray-700">Active Promotion</label>

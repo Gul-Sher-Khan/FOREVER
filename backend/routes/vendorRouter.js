@@ -24,4 +24,16 @@ router.delete("/products/:productId", vendorController.deleteProduct);
 
 router.get("/analytics", vendorController.getAnalyticsData);
 
+// Route to get all offers for a specific store
+router.get("/offers", vendorController.getOffers);
+
+// Route to create a new offer
+router.post("/offers", vendorController.createOffer);
+
+// Route to update an offer
+router.put("/offers/:id", vendorController.updateOffer);
+
+// Route to delete an offer
+router.delete("/offers/:id", vendorController.deleteOffer);
+
 module.exports = router;
