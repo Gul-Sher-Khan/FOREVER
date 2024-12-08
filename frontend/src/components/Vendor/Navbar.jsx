@@ -10,6 +10,7 @@ import {
   FaIndustry,
 } from "react-icons/fa";
 import { FiMenu, FiX } from "react-icons/fi";
+import authService from "../../Utils/authService";
 
 const menuItems = [
   { name: "Dashboard", icon: FaHome, path: "/vendor/" },
@@ -74,6 +75,18 @@ const Navbar = () => {
                   </Link>
                 </li>
               ))}
+              {/* logout button */}
+              <li>
+                <button
+                  className="flex items-center gap-2 px-4 py-3 sm:py-2 sm:px-4 text-sm rounded-lg transition-colors text-gray-600 hover:bg-gray-100"
+                  onClick={() => {
+                    authService.logout();
+                  }}
+                >
+                  <FaHome className="w-4 h-4" />
+                  Logout
+                </button>
+              </li>
             </ul>
           </div>
         </div>

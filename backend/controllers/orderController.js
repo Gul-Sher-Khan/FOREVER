@@ -22,6 +22,7 @@ exports.createOrder = async (req, res) => {
           .json({ message: `Product ${item.productId} is out of stock.` });
       }
       product.stock -= item.quantity;
+      item.storeId = product.store;
       await product.save();
 
       total += product.price * item.quantity;

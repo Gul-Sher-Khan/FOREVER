@@ -23,6 +23,7 @@ app.use("/api/auth", require("./routes/authRouter"));
 app.use("/api/products", requireAuth, require("./routes/productRouter"));
 app.use("/api/orders", requireAuth, require("./routes/orderRouter"));
 app.use("/api/wishlist", requireAuth, require("./routes/wishlistRouter"));
+app.use("/api/vendor", requireAuth, require("./routes/vendorRouter"));
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
