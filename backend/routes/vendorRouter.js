@@ -8,10 +8,18 @@ router.get("/dashboard", vendorController.getDashboardData);
 router.get("/orders", vendorController.getOrders);
 
 // Update order status (from Pending to Delivered, etc.)
-router.put(
-  "/orders/update",
+router.put("/orders/update", vendorController.updateOrderStatus);
 
-  vendorController.updateOrderStatus
-);
+// Route to get all products for the authenticated vendor
+router.get("/products", vendorController.getProducts);
+
+// Route to create a new product
+router.post("/products", vendorController.createProduct);
+
+// Route to update stock of a product
+router.put("/products/:productId/stock", vendorController.updateProductStock);
+
+// Route to delete a product
+router.delete("/products/:productId", vendorController.deleteProduct);
 
 module.exports = router;

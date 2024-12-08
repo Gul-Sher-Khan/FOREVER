@@ -1,58 +1,53 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axiosInstance from "../../Utils/axiosInstance";
 
 const ManageInventory = () => {
-  const [products, setProducts] = useState([
-    {
-      id: 1,
-      name: "Product A",
-      category: "Clothing",
-      price: 50,
-      stock: 20,
-      image: "https://via.placeholder.com/150",
-    },
-    {
-      id: 2,
-      name: "Product B",
-      category: "Electronics",
-      price: 200,
-      stock: 10,
-      image: "https://via.placeholder.com/150",
-    },
-    {
-      id: 3,
-      name: "Product C",
-      category: "Groceries",
-      price: 15,
-      stock: 50,
-      image: "https://via.placeholder.com/150",
-    },
-    {
-      id: 4,
-      name: "Product D",
-      category: "Accessories",
-      price: 75,
-      stock: 5,
-      image: "https://via.placeholder.com/150",
-    },
-  ]);
-
+  const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleUpdateStock = (id, newStock) => {
-    setProducts((prevProducts) =>
-      prevProducts.map((product) =>
-        product.id === id ? { ...product, stock: newStock } : product
-      )
-    );
-    closeModal();
+  // Fetch the products when the component mounts
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axiosInstance.get("/vendor/products", {});
+        setProducts(response.data);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  const handleUpdateStock = async (id, newStock) => {
+    try {
+      await axiosInstance.put(`/vendor/products/${id}/stock`, {
+        stock: newStock,
+      });
+
+      setProducts((prevProducts) =>
+        prevProducts.map((product) =>
+          product._id === id ? { ...product, stock: newStock } : product
+        )
+      );
+      closeModal();
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const handleDeleteProduct = (id) => {
-    setProducts((prevProducts) =>
-      prevProducts.filter((product) => product.id !== id)
-    );
-    closeModal();
+  const handleDeleteProduct = async (id) => {
+    try {
+      await axiosInstance.delete(`/vendor/products/${id}`);
+
+      setProducts((prevProducts) =>
+        prevProducts.filter((product) => product._id !== id)
+      );
+      closeModal();
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const openModal = (product) => {
@@ -100,13 +95,13 @@ const ManageInventory = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {products.map((product) => (
           <div
-            key={product.id}
+            key={product._id}
             className="bg-white shadow-lg rounded-lg overflow-hidden"
           >
             <img
               src={product.image}
               alt={product.name}
-              className="w-full h-40 object-cover"
+              className="w-full h-80 object-cover object-top"
             />
             <div className="p-4">
               <h3 className="text-lg font-semibold text-gray-800">
@@ -129,16 +124,12 @@ const ManageInventory = () => {
                   ? "Out of Stock"
                   : `Stock: ${product.stock}`}
               </p>
-
-              {/* Action Buttons */}
-              <div className="flex justify-between mt-4">
-                <button
-                  onClick={() => openModal(product)}
-                  className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-600"
-                >
-                  Manage
-                </button>
-              </div>
+              <button
+                onClick={() => openModal(product)}
+                className="mt-4 py-2 px-4 bg-blue-600 text-white text-sm font-semibold rounded-lg"
+              >
+                Edit Stock
+              </button>
             </div>
           </div>
         ))}
@@ -146,37 +137,42 @@ const ManageInventory = () => {
 
       {/* Modal */}
       {isModalOpen && selectedProduct && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <div className="bg-white rounded-lg shadow-lg w-96 p-6">
+        <div className="fixed inset-0 flex justify-center items-center bg-gray-800 bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-1/3">
             <h2 className="text-xl font-semibold text-gray-800 mb-4">
-              Manage {selectedProduct.name}
+              Edit Stock for {selectedProduct.name}
             </h2>
-            <div>
-              <p className="text-sm text-gray-500">Update Stock:</p>
-              <input
-                type="number"
-                defaultValue={selectedProduct.stock}
-                className="w-full border border-gray-300 rounded-lg p-2 mt-2 focus:ring focus:ring-blue-500 focus:outline-none"
-                onChange={(e) =>
-                  handleUpdateStock(
-                    selectedProduct.id,
-                    parseInt(e.target.value)
-                  )
-                }
-              />
-            </div>
-            <div className="flex justify-end gap-4 mt-6">
-              <button
-                onClick={() => handleDeleteProduct(selectedProduct.id)}
-                className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-              >
-                Delete Product
-              </button>
+            <input
+              type="number"
+              value={selectedProduct.stock}
+              onChange={(e) =>
+                setSelectedProduct((prev) => ({
+                  ...prev,
+                  stock: e.target.value,
+                }))
+              }
+              className="w-full px-4 py-2 border rounded-lg mb-4"
+            />
+            <div className="flex justify-between">
               <button
                 onClick={closeModal}
-                className="bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300"
+                className="py-2 px-4 bg-gray-300 text-gray-700 rounded-lg"
               >
                 Cancel
+              </button>
+              <button
+                onClick={() =>
+                  handleUpdateStock(selectedProduct._id, selectedProduct.stock)
+                }
+                className="py-2 px-4 bg-blue-600 text-white rounded-lg"
+              >
+                Update Stock
+              </button>
+              <button
+                onClick={() => handleDeleteProduct(selectedProduct._id)}
+                className="py-2 px-4 bg-red-600 text-white rounded-lg"
+              >
+                Delete Product
               </button>
             </div>
           </div>

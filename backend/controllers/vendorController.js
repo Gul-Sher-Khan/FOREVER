@@ -2,6 +2,8 @@ const Order = require("../models/Order");
 const Store = require("../models/Store");
 const Review = require("../models/Review");
 const moment = require("moment");
+const Product = require("../models/Product");
+const mongoose = require("mongoose");
 
 // Get Vendor Dashboard Data
 exports.getDashboardData = async (req, res) => {
@@ -167,5 +169,104 @@ exports.updateOrderStatus = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error updating order status." });
+  }
+};
+
+// Create a product for the vendor's store
+exports.createProduct = async (req, res) => {
+  try {
+    const vendorId = req.user._id;
+
+    // Find the vendor's store
+    const store = await Store.findOne({ owner: vendorId });
+    if (!store) {
+      return res.status(404).json({ message: "Store not found" });
+    }
+
+    const newProduct = new Product({
+      name: req.body.name,
+      description: req.body.description,
+      price: req.body.price,
+      category: req.body.category,
+      subcategory: req.body.subcategory,
+      image: req.body.image,
+      stock: req.body.stock,
+      sizes: req.body.sizes,
+      store: store._id, // Associate product with vendor's store
+    });
+
+    const savedProduct = await newProduct.save();
+    return res.status(201).json(savedProduct);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+// Update the stock of a product
+exports.updateProductStock = async (req, res) => {
+  try {
+    const productId = req.params.productId;
+    const vendorId = req.user._id;
+    const newStock = req.body.stock;
+
+    const product = await Product.findOne({
+      _id: productId,
+    });
+    if (!product) {
+      return res
+        .status(404)
+        .json({ message: "Product not found or unauthorized" });
+    }
+
+    product.stock = newStock;
+    await product.save();
+
+    return res
+      .status(200)
+      .json({ message: "Stock updated successfully", product });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+// Delete a product
+exports.deleteProduct = async (req, res) => {
+  try {
+    const productId = req.params.productId;
+    const vendorId = req.user._id;
+
+    const product = await Product.findOne({
+      _id: productId,
+      store: { $in: [vendorId] },
+    });
+    if (!product) {
+      return res
+        .status(404)
+        .json({ message: "Product not found or unauthorized" });
+    }
+
+    await Product.deleteOne({ _id: productId });
+    return res.status(200).json({ message: "Product deleted successfully" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
+};
+
+// Get all products for a vendor
+exports.getProducts = async (req, res) => {
+  try {
+    const vendorId = req.user._id;
+
+    // Find the vendor's store
+    const store = await Store.findOne({ owner: vendorId });
+    if (!store) {
+      return res.status(404).json({ message: "Store not found" });
+    }
+
+    // Get all products belonging to the vendor's store
+    const products = await Product.find({ store: store._id });
+    return res.status(200).json(products);
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
   }
 };
