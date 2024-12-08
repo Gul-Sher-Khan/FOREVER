@@ -1,40 +1,48 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axiosInstance from "../../Utils/axiosInstance";
 
 const Orders = () => {
-  const [orders, setOrders] = useState([
-    {
-      id: 1,
-      customerName: "John Doe",
-      customerAddress: "123 Main St, Springfield",
-      email: "johndoe@example.com",
-      products: [
-        { name: "Product A", quantity: 2, price: 20 },
-        { name: "Product B", quantity: 1, price: 50 },
-      ],
-      status: "Pending",
-      total: 90,
-    },
-    {
-      id: 2,
-      customerName: "Jane Smith",
-      customerAddress: "456 Elm St, Shelbyville",
-      email: "janesmith@example.com",
-      products: [
-        { name: "Product C", quantity: 3, price: 15 },
-        { name: "Product D", quantity: 1, price: 100 },
-      ],
-      status: "Pending",
-      total: 145,
-    },
-  ]);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleStatusChange = (id, status) => {
-    setOrders((prevOrders) =>
-      prevOrders.map((order) =>
-        order.id === id ? { ...order, status: status } : order
-      )
-    );
+  // Fetch orders from the backend
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const response = await axiosInstance.get("/vendor/orders");
+        setOrders(response.data);
+        console.log(response.data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchOrders();
+  }, []);
+
+  // Handle order status change
+  const handleStatusChange = async (id, status) => {
+    try {
+      const response = await axiosInstance.put("/vendor/orders/update", {
+        orderId: id,
+        status,
+      });
+      // Update the local state with the new order status
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order._id === id ? { ...order, status: response.data.status } : order
+        )
+      );
+    } catch (error) {
+      console.error("Error updating order status:", error);
+    }
   };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -84,23 +92,25 @@ const Orders = () => {
           <tbody className="text-gray-600 text-sm">
             {orders.map((order) => (
               <tr
-                key={order.id}
+                key={order._id}
                 className="border-b hover:bg-gray-100 transition"
               >
                 <td className="py-3 px-6">
-                  <p className="font-medium">{order.customerName}</p>
-                  <p className="text-sm text-gray-500">{order.email}</p>
+                  <p className="font-medium">{order.user.name}</p>
+                  <p className="text-sm text-gray-500">{order.user.email}</p>
                 </td>
                 <td className="py-3 px-6">
-                  <p>{order.customerAddress}</p>
+                  <p>
+                    {order.address.street}, {order.address.city}
+                  </p>
                 </td>
                 <td className="py-3 px-6">
                   <ul>
                     {order.products.map((product, index) => (
                       <li key={index} className="flex justify-between">
-                        <span>{product.name}</span>
+                        <span>{product.productId.name}</span>
                         <span>
-                          {product.quantity} x ${product.price}
+                          {product.quantity} x ${product.productId.price}
                         </span>
                       </li>
                     ))}
@@ -125,7 +135,7 @@ const Orders = () => {
                     <>
                       <button
                         onClick={() =>
-                          handleStatusChange(order.id, "Delivered")
+                          handleStatusChange(order._id, "Delivered")
                         }
                         className="bg-green-500 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-600 transition"
                       >
@@ -133,7 +143,7 @@ const Orders = () => {
                       </button>
                       <button
                         onClick={() =>
-                          handleStatusChange(order.id, "Cancelled")
+                          handleStatusChange(order._id, "Cancelled")
                         }
                         className="bg-red-500 text-white px-4 py-2 rounded-lg text-sm ml-2 hover:bg-red-600 transition"
                       >

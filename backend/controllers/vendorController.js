@@ -114,3 +114,58 @@ exports.getDashboardData = async (req, res) => {
     res.status(500).json({ message: "Error fetching dashboard data." });
   }
 };
+
+// Get Vendor Dashboard Data
+exports.getOrders = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // Get the store owned by the user (vendor)
+    const store = await Store.findOne({ owner: userId });
+
+    if (!store) {
+      return res.status(404).json({ message: "Store not found." });
+    }
+
+    // Fetch orders for the store, populate product and user details
+    const orders = await Order.find({
+      "products.storeId": store._id, // Match storeId in products array
+    })
+      .populate("products.productId") // Populate the 'productId' field in products
+      .populate("user"); // Populate the 'user' field
+
+    // Return the orders for the vendor
+    res.status(200).json(orders);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error fetching orders." });
+  }
+};
+
+// Update Order Status
+exports.updateOrderStatus = async (req, res) => {
+  try {
+    const { orderId, status } = req.body; // Expecting orderId and status in the body
+
+    // Validate status
+    if (!["Pending", "Shipped", "Delivered", "Cancelled"].includes(status)) {
+      return res.status(400).json({ message: "Invalid status." });
+    }
+
+    // Update order status
+    const order = await Order.findByIdAndUpdate(
+      orderId,
+      { status },
+      { new: true }
+    );
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found." });
+    }
+
+    res.status(200).json(order);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error updating order status." });
+  }
+};
