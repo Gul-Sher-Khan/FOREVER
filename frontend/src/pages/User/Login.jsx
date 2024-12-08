@@ -1,11 +1,38 @@
-
 import { useState } from "react";
+import authService from "../../Utils/authService";
+import { navigateByRole } from "../../Utils/authGuard";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [currentState, setCurrentState] = useState("Sign Up");
 
+  const navigate = useNavigate();
+
   const onSubmitHandler = async (event) => {
-    event.preventDefault();
+    if (currentState === "Login") {
+      event.preventDefault();
+      const email = event.target[0].value;
+      const password = event.target[1].value;
+      const response = await authService.login({ email, pass: password });
+      if (response.token) {
+        navigateByRole(response.role, navigate);
+      }
+    } else {
+      event.preventDefault();
+      const name = event.target[0].value;
+      const email = event.target[1].value;
+      const password = event.target[2].value;
+      const response = await authService.signup({
+        name,
+        email,
+        pass: password,
+        role: "user",
+        storeName: "",
+      });
+      if (response.token) {
+        navigateByRole(response.role, navigate);
+      }
+    }
   };
 
   return (

@@ -10,6 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 import VendorLayout from "./Layouts/VendorLayout";
 import AdminLayout from "./Layouts/AdminLayout";
 import UserLayout from "./Layouts/UserLayout";
+import { AuthGuard } from "./Utils/authGuard";
 const App = () => {
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -19,6 +20,7 @@ const App = () => {
         menuOpen ? "opacity-90 pointer-events-none" : "opacity-100"
       }`}
     >
+      <AuthGuard />
       <ToastContainer />
       <Routes>
         <Route
