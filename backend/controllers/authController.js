@@ -10,7 +10,7 @@ const generateToken = (user) => {
 };
 
 exports.signup = async (req, res) => {
-  const { name, email, pass, role } = req.body;
+  const { name, email, pass, role, storeName } = req.body;
 
   try {
     const existingUser = await User.findOne({ email });
@@ -24,7 +24,7 @@ exports.signup = async (req, res) => {
 
     // Create a store if the user is a vendor
     if (role === "vendor") {
-      const newStore = new Store({ owner: user._id });
+      const newStore = new Store({ owner: user._id, name: storeName });
       await newStore.save();
     }
 

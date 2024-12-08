@@ -14,6 +14,10 @@ app.use(
   })
 );
 
+app.get("/", (req, res) => {
+  res.send("Welcome to the authentication API!");
+});
+
 app.use("/api/auth", require("./routes/authRouter"));
 
 app.use((err, req, res, next) => {
