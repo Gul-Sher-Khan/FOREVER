@@ -91,6 +91,7 @@ const ShopContextProvider = (props) => {
     user,
     setUser,
     setProducts,
+    setCartItems,
   };
 
   return (
