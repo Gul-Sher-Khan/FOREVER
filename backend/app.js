@@ -19,6 +19,8 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", require("./routes/authRouter"));
+app.use("/api/products", require("./routes/productRouter"));
+app.use("/api/orders", require("./routes/orderRouter"));
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

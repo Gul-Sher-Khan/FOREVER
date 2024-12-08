@@ -2,22 +2,20 @@ import { useContext, useEffect, useState } from "react";
 import { ShopContext } from "../../context/ShopContext";
 import Title from "../../components/User/Title";
 import ProductItem from "../../components/User/ProductItem";
+import axiosInstance from "../../Utils/axiosInstance";
 
-const RelatedProducts = ({ category, subCategory }) => {
-  const { products } = useContext(ShopContext);
+const RelatedProducts = ({ id }) => {
   const [related, setRelated] = useState([]);
 
-  useEffect(() => {
-    if (products.length > 0) {
-      let productsCopy = products.slice();
+  const getRelated = () => {
+    axiosInstance.get(`/products/${id}/related`).then((res) => {
+      setRelated(res.data);
+    });
+  };
 
-      productsCopy = productsCopy.filter((item) => item.category === category);
-      productsCopy = productsCopy.filter(
-        (item) => item.subCategory === subCategory
-      );
-      setRelated(productsCopy.slice(0, 5));
-    }
-  }, [products]);
+  useEffect(() => {
+    getRelated();
+  }, []);
 
   return (
     <div className="my-24">

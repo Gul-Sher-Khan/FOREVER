@@ -1,6 +1,5 @@
 import { createContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { products } from "../assets/assets";
 import PropTypes from "prop-types";
 import { toast } from "react-toastify";
 
@@ -13,6 +12,7 @@ const ShopContextProvider = (props) => {
   const [showSearch, setShowSearch] = useState(false);
   const [cartItems, setCartItems] = useState({});
   const navigate = useNavigate();
+  const [products, setProducts] = useState([]);
 
   const [user, setUser] = useState(null);
 
@@ -90,6 +90,7 @@ const ShopContextProvider = (props) => {
     navigate,
     user,
     setUser,
+    setProducts,
   };
 
   return (

@@ -10,7 +10,7 @@ const ProductItem = ({ id, image, name, price }) => {
     <Link to={`/user/product/${id}`} className="text-gray-700 cursor-pointer">
       <div className="overflow-hidden">
         <img
-          src={image[0]}
+          src={image}
           alt=""
           className="hover:scale-110 transition ease-in-out"
         />
@@ -24,11 +24,4 @@ const ProductItem = ({ id, image, name, price }) => {
   );
 };
 
-ProductItem.propTypes = {
-  id: PropTypes.string.isRequired,
-  image: PropTypes.array.isRequired,
-  name: PropTypes.string.isRequired,
-  price: PropTypes.number.isRequired,
-};
-
-export default ProductItem;
+  export default ProductItem;

@@ -3,14 +3,26 @@ import { ShopContext } from "../../context/ShopContext";
 import { assets } from "../../assets/assets";
 import Title from "../../components/User/Title";
 import ProductItem from "../../components/User/ProductItem";
+import axiosInstance from "../../Utils/axiosInstance";
 
 const Collection = () => {
-  const { products, search, showSearch } = useContext(ShopContext);
+  const { products, setProducts, search, showSearch } = useContext(ShopContext);
   const [showFilter, setShowFilter] = useState(false);
   const [filterProducts, setFilterProducts] = useState([]);
   const [category, setCategory] = useState([]);
   const [subCategory, setSubCategory] = useState([]);
   const [sortType, setSortType] = useState("relavent");
+
+  const getProducts = async () => {
+    try {
+      axiosInstance.get("/products").then((res) => {
+        setProducts(res.data);
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   // made toogle function for category
   const toggleCategory = (e) => {
     if (category.includes(e.target.value)) {
@@ -67,11 +79,19 @@ const Collection = () => {
   };
 
   useEffect(() => {
-    applyFilter();
-  }, [category, subCategory, search, showSearch]);
+    getProducts();
+  }, []);
+
+  useEffect(() => {
+    if (products.length > 0) {
+      applyFilter(); // Apply filter right after products are fetched
+    }
+  }, [products, category, subCategory, search, showSearch]);
+
   useEffect(() => {
     sortProducts();
-  }, [sortType]);
+  }, [sortType, filterProducts]);
+
   return (
     <div className="flex flex-xol sm:flex-row gap-1 sm:gap-10 pt-10 border-t">
       {/* Filter Options */}
