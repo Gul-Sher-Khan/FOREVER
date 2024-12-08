@@ -2,14 +2,20 @@ import { useContext, useEffect, useState } from "react";
 import { ShopContext } from "../../context/ShopContext"; // Adjust the import path as necessary
 import Title from "./Title"; // Adjust the import path as necessary
 import ProductItem from "./ProductItem"; // Adjust the import path as necessary
+import axiosInstance from "../../Utils/axiosInstance";
 
 const BestSeller = () => {
   const { products } = useContext(ShopContext);
   const [bestSeller, setBestSeller] = useState([]);
 
+  const getBestSeller = () => {
+    axiosInstance.get("/products/bestsellers").then((res) => {
+      setBestSeller(res.data);
+    });
+  };
+
   useEffect(() => {
-    const bestProduct = products.filter((item) => item.bestseller);
-    setBestSeller(bestProduct.slice(0, 5));
+    getBestSeller();
   }, []);
   return (
     <div className="my-10">

@@ -2,13 +2,19 @@ import { useContext, useState, useEffect } from "react";
 import { ShopContext } from "../../context/ShopContext";
 import Title from "./Title";
 import ProductItem from "./ProductItem";
+import axiosInstance from "../../Utils/axiosInstance";
 
 const LatestCollection = () => {
-  const { products } = useContext(ShopContext);
   const [latestProducts, setLatestProducts] = useState([]);
 
+  const getLatestProducts = () => {
+    axiosInstance.get("/products/latest").then((res) => {
+      setLatestProducts(res.data);
+    });
+  };
+
   useEffect(() => {
-    setLatestProducts(products.slice(0, 10));
+    getLatestProducts();
   }, []);
 
   return (
