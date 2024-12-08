@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { Line, Bar, Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -11,7 +12,7 @@ import {
   Legend,
   ArcElement,
 } from "chart.js";
-import { Line, Bar, Pie } from "react-chartjs-2";
+import axiosInstance from "../../Utils/axiosInstance";
 
 // Register Chart.js components
 ChartJS.register(
@@ -27,13 +28,63 @@ ChartJS.register(
 );
 
 const AnalyticsPage = () => {
-  // Sample Data for Charts
+  const [analyticsData, setAnalyticsData] = useState(null);
+
+  useEffect(() => {
+    const fetchAnalyticsData = async () => {
+      try {
+        const response = await axiosInstance.get("/vendor/analytics");
+        setAnalyticsData(response.data);
+      } catch (error) {
+        console.error("Error fetching analytics data:", error);
+      }
+    };
+
+    fetchAnalyticsData();
+  }, []);
+
+  if (!analyticsData) return <div>Loading...</div>;
+
+  const {
+    totalRevenue,
+    totalSales,
+    categorySales,
+    monthlySales, // Ensure the correct naming here
+    avgRating,
+    quarterlySales, // Ensure the correct naming here
+  } = analyticsData;
+
+  // Chart.js Data Configuration for Analytics Page
+  const getLastSixMonths = () => {
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    const today = new Date();
+    let result = [];
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
+      result.push(months[date.getMonth()]);
+    }
+    return result;
+  };
+
   const salesLineData = {
-    labels: ["January", "February", "March", "April", "May", "June"],
+    labels: getLastSixMonths(), // Last 6 months from today
     datasets: [
       {
         label: "Sales ($)",
-        data: [1200, 1500, 1800, 2200, 2500, 3000],
+        data: monthlySales.slice(-6), // Ensure this data exists in the response
         borderColor: "rgba(59, 130, 246, 1)",
         backgroundColor: "rgba(59, 130, 246, 0.5)",
         tension: 0.4,
@@ -44,11 +95,11 @@ const AnalyticsPage = () => {
   };
 
   const revenueBarData = {
-    labels: ["Q1", "Q2", "Q3", "Q4"],
+    labels: ["Q1", "Q2", "Q3", "Q4"], // Quarterly labels
     datasets: [
       {
         label: "Revenue ($)",
-        data: [8000, 12000, 15000, 20000],
+        data: quarterlySales, // Data from backend
         backgroundColor: [
           "rgba(34, 197, 94, 0.7)",
           "rgba(59, 130, 246, 0.7)",
@@ -60,10 +111,10 @@ const AnalyticsPage = () => {
   };
 
   const categoryPieData = {
-    labels: ["Clothing", "Electronics", "Groceries", "Accessories"],
+    labels: Object.keys(categorySales), // cateegorySales from backend
     datasets: [
       {
-        data: [40, 25, 20, 15],
+        data: Object.values(categorySales), // Category values from backend
         backgroundColor: [
           "rgba(34, 197, 94, 0.7)",
           "rgba(59, 130, 246, 0.7)",
@@ -93,17 +144,17 @@ const AnalyticsPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <div className="bg-white shadow-lg rounded-lg p-4">
           <h2 className="text-lg font-medium text-gray-800">Total Revenue</h2>
-          <p className="text-3xl font-bold text-green-600">$72,000</p>
+          <p className="text-3xl font-bold text-green-600">${totalRevenue}</p>
         </div>
         <div className="bg-white shadow-lg rounded-lg p-4">
           <h2 className="text-lg font-medium text-gray-800">Total Sales</h2>
-          <p className="text-3xl font-bold text-blue-600">1,800</p>
+          <p className="text-3xl font-bold text-blue-600">{totalSales}</p>
         </div>
         <div className="bg-white shadow-lg rounded-lg p-4">
           <h2 className="text-lg font-medium text-gray-800">
             Customer Reviews
           </h2>
-          <p className="text-3xl font-bold text-pink-600">4.9/5</p>
+          <p className="text-3xl font-bold text-pink-600">{avgRating}/5</p>
         </div>
       </div>
 
@@ -133,27 +184,12 @@ const AnalyticsPage = () => {
           <Pie data={categoryPieData} />
         </div>
 
-        {/* Additional Chart (e.g., Profit Analysis) */}
+        {/* Profit Analysis Line Chart */}
         <div className="bg-white shadow-lg rounded-lg p-6">
           <h2 className="text-lg font-medium text-gray-800 mb-4">
             Profit Analysis
           </h2>
-          <Line
-            data={{
-              labels: ["January", "February", "March", "April", "May", "June"],
-              datasets: [
-                {
-                  label: "Profit ($)",
-                  data: [300, 500, 700, 1000, 1200, 1500],
-                  borderColor: "rgba(236, 72, 153, 1)",
-                  backgroundColor: "rgba(236, 72, 153, 0.5)",
-                  tension: 0.4,
-                  pointRadius: 5,
-                  pointBackgroundColor: "rgba(236, 72, 153, 1)",
-                },
-              ],
-            }}
-          />
+          <Line data={salesLineData} />
         </div>
       </div>
     </div>

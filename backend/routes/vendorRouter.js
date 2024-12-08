@@ -22,4 +22,6 @@ router.put("/products/:productId/stock", vendorController.updateProductStock);
 // Route to delete a product
 router.delete("/products/:productId", vendorController.deleteProduct);
 
+router.get("/analytics", vendorController.getAnalyticsData);
+
 module.exports = router;
