@@ -1,4 +1,3 @@
-
 const Order = require("../models/Order");
 const Product = require("../models/Product");
 
@@ -86,18 +85,6 @@ exports.updateProduct = async (req, res) => {
     res.status(200).json(product);
   } catch (error) {
     res.status(400).json({ message: "Error updating product", error });
-  }
-};
-
-exports.deleteProduct = async (req, res) => {
-  try {
-    const product = await Product.findByIdAndDelete(req.params.id);
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
-    }
-    res.status(200).json({ message: "Product deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ message: "Error deleting product", error });
   }
 };
 
@@ -191,5 +178,50 @@ exports.getLatestCollection = async (req, res) => {
       );
   } catch (error) {
     res.status(500).json({ message: "Error fetching latest products", error });
+  }
+};
+
+// Retrieve products (filter by store if provided)
+exports.getProducts = async (req, res) => {
+  try {
+    const { storeId } = req.query; // Optional filter by store
+    const products = storeId
+      ? await Product.find({ store: storeId })
+      : await Product.find();
+    res.status(200).json(products);
+  } catch (error) {
+    res.status(500).json({ message: "Error retrieving products", error });
+  }
+};
+
+// Approve a product
+exports.approveProduct = async (req, res) => {
+  try {
+    const { productId } = req.params;
+    const updatedProduct = await Product.findByIdAndUpdate(
+      productId,
+      { status: "Approved" },
+      { new: true }
+    );
+    if (!updatedProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    res.status(200).json(updatedProduct);
+  } catch (error) {
+    res.status(500).json({ message: "Error approving product", error });
+  }
+};
+
+// Delete a product
+exports.deleteProduct = async (req, res) => {
+  try {
+    const { productId } = req.params;
+    const deletedProduct = await Product.findByIdAndDelete(productId);
+    if (!deletedProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    res.status(200).json({ message: "Product deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "Error deleting product", error });
   }
 };

@@ -1,148 +1,131 @@
-import React, { useState } from "react";
-import { FaCheckCircle, FaTrash, FaFilter, FaBox } from "react-icons/fa";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import axiosInstance from "../../Utils/axiosInstance";
 
-const ProductApproval = () => {
-  const [selectedVendor, setSelectedVendor] = useState("");
-  const [filter, setFilter] = useState("");
+const ProductsApproval = () => {
+  const [vendors, setVendors] = useState([]);
+  const [stores, setStores] = useState([]);
+  const [selectedStore, setSelectedStore] = useState("");
   const [products, setProducts] = useState([]);
 
-  const vendors = ["Elite Fashion", "Urban Styles", "Trend Hub"];
-  const sampleProducts = [
-    {
-      id: 1,
-      name: "Designer Jacket",
-      price: 120,
-      status: "Pending",
-      category: "Clothing",
-      image: "https://via.placeholder.com/150",
-    },
-    {
-      id: 2,
-      name: "Leather Boots",
-      price: 95,
-      status: "Approved",
-      category: "Footwear",
-      image: "https://via.placeholder.com/150",
-    },
-    {
-      id: 3,
-      name: "Handmade Scarf",
-      price: 45,
-      status: "Pending",
-      category: "Accessories",
-      image: "https://via.placeholder.com/150",
-    },
-  ];
+  // Fetch vendors and stores
+  useEffect(() => {
+    const fetchVendorsAndStores = async () => {
+      try {
+        const { data } = await axiosInstance.get("/admin/vendors-and-stores");
+        setVendors(data.vendors);
+        setStores(data.stores);
+      } catch (error) {
+        console.error("Error fetching vendors and stores:", error);
+      }
+    };
 
-  const retrieveProducts = () => {
-    // Simulate product retrieval
-    setProducts(sampleProducts);
-  };
+    fetchVendorsAndStores();
+  }, []);
 
-  const handleFilterChange = (event) => {
-    setFilter(event.target.value);
-  };
+  // Fetch products for selected store
+  useEffect(() => {
+    if (!selectedStore) return;
 
-  const handleDeleteProduct = (id) => {
-    setProducts(products.filter((product) => product.id !== id));
+    const fetchProducts = async () => {
+      try {
+        const { data } = await axiosInstance.get(
+          `/admin/products/${selectedStore}`
+        );
+        setProducts(data);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    fetchProducts();
+  }, [selectedStore]);
+
+  // Delete product
+  const handleDeleteProduct = async (productId) => {
+    try {
+      await axiosInstance.delete(`/admin/product/${productId}`);
+      setProducts(products.filter((product) => product._id !== productId));
+    } catch (error) {
+      console.error("Error deleting product:", error);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 md:p-12">
-      <header className="mb-6 text-center md:text-left">
-        <h1 className="text-3xl font-bold text-gray-800">Product Approval</h1>
-        <p className="text-gray-600 mt-2">
-          Approve or remove products uploaded by vendors.
+    <div className="min-h-screen bg-gray-100 p-6">
+      <header className="mb-8">
+        <h1 className="text-4xl font-extrabold text-gray-900">
+          Vendor Management
+        </h1>
+        <p className="text-gray-700 mt-2">
+          Manage vendors, stores, and their products efficiently.
         </p>
       </header>
 
-      {/* Vendor Selection */}
-      <div className="flex flex-col md:flex-row items-center gap-4 mb-6">
-        <select
-          className="w-full md:w-auto px-4 py-2 border rounded-lg shadow-sm focus:ring focus:ring-blue-200"
-          value={selectedVendor}
-          onChange={(e) => setSelectedVendor(e.target.value)}
+      {/* Store Selector */}
+      <div className="mb-8 bg-white shadow rounded-lg p-6">
+        <label
+          htmlFor="storeSelect"
+          className="block text-lg font-semibold text-gray-700 mb-3"
         >
-          <option value="">Select a Vendor</option>
-          {vendors.map((vendor, index) => (
-            <option key={index} value={vendor}>
-              {vendor}
+          Select a Store
+        </label>
+        <select
+          id="storeSelect"
+          className="w-full border border-gray-300 rounded-lg p-3 text-gray-700 focus:ring-2 focus:ring-blue-500"
+          value={selectedStore}
+          onChange={(e) => setSelectedStore(e.target.value)}
+        >
+          <option value="">-- Choose a Store --</option>
+          {stores.map((store) => (
+            <option key={store._id} value={store._id}>
+              {store.name}
             </option>
           ))}
         </select>
-        <button
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow-lg hover:bg-blue-700 transition"
-          onClick={retrieveProducts}
-        >
-          Retrieve Products
-        </button>
       </div>
 
-      {/* Filter Section */}
-      <div className="flex flex-col md:flex-row items-center gap-4 mb-6 bg-white p-4 rounded-lg shadow-lg">
-        <FaFilter className="text-gray-500" />
-        <input
-          type="text"
-          placeholder="Filter by name or category"
-          className="w-full md:w-auto px-4 py-2 border rounded-lg focus:ring focus:ring-blue-200"
-          value={filter}
-          onChange={handleFilterChange}
-        />
-      </div>
-
-      {/* Product Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {products
-          .filter((product) =>
-            product.name.toLowerCase().includes(filter.toLowerCase())
-          )
-          .map((product) => (
-            <motion.div
-              key={product.id}
-              className="bg-white p-4 rounded-lg shadow-lg relative overflow-hidden hover:shadow-xl transition"
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-            >
-              <img
-                src={product.image}
-                alt={product.name}
-                className="w-full h-40 object-cover rounded-md"
-              />
-              <div className="mt-4">
-                <h3 className="text-lg font-bold text-gray-800">
+      {/* Products Grid */}
+      <div className="bg-white shadow-lg rounded-lg p-6">
+        <h2 className="text-2xl font-semibold text-gray-800 mb-4">Products</h2>
+        {products.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-6">
+            {products.map((product) => (
+              <motion.div
+                key={product._id}
+                className="bg-white rounded-lg shadow-md p-4 border border-gray-200"
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.3 }}
+              >
+                <img
+                  src={product.image || "https://via.placeholder.com/150"}
+                  alt={product.name}
+                  className="w-full h-64 object-cover rounded-lg mb-4"
+                />
+                <h3 className="text-lg font-semibold text-gray-800">
                   {product.name}
                 </h3>
-                <p className="text-gray-600 mt-1">${product.price}</p>
-                <span
-                  className={`mt-2 inline-block px-3 py-1 rounded-full text-xs font-medium ${
-                    product.status === "Approved"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-yellow-100 text-yellow-800"
-                  }`}
-                >
-                  {product.status}
-                </span>
-              </div>
-              <div className="flex justify-between mt-4">
-                <button className="px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
-                  <FaCheckCircle className="inline-block mr-2" />
-                  Approve
-                </button>
+                <p className="text-gray-600 mt-1">
+                  <strong>Price:</strong> ${product.price.toFixed(2)}
+                </p>
+                <p className="text-gray-600 mt-1">
+                  <strong>Stock:</strong> {product.stock}
+                </p>
                 <button
-                  onClick={() => handleDeleteProduct(product.id)}
-                  className="px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition"
+                  onClick={() => handleDeleteProduct(product._id)}
+                  className="mt-4 w-full bg-red-500 text-white py-2 rounded-lg font-medium hover:bg-red-600 transition"
                 >
-                  <FaTrash className="inline-block mr-2" />
                   Delete
                 </button>
-              </div>
-              <div className="absolute -top-10 -right-10 bg-blue-100 w-24 h-24 rounded-full transform rotate-45 z-0"></div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-gray-500">No products found for this store.</p>
+        )}
       </div>
     </div>
   );
 };
 
-export default ProductApproval;
+export default ProductsApproval;

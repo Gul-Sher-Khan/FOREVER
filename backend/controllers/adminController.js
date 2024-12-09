@@ -231,3 +231,52 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to delete user." });
   }
 };
+
+// Get all vendors and their stores
+exports.getVendorsAndStores = async (req, res) => {
+  try {
+    // Fetch all users with role 'vendor'
+    const vendors = await User.find({ role: "vendor" }).select("id name email");
+
+    // Fetch stores for these vendors
+    const vendorIds = vendors.map((vendor) => vendor._id);
+    const stores = await Store.find({ owner: { $in: vendorIds } }).select(
+      "id name owner"
+    );
+
+    res.json({ vendors, stores });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error fetching vendors and stores" });
+  }
+};
+
+// Get products for a specific store
+exports.getProductsByStore = async (req, res) => {
+  const { storeId } = req.params;
+
+  try {
+    const products = await Product.find({ store: storeId }).select(
+      "id name price stock image"
+    );
+    res.json(products);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error fetching products" });
+  }
+};
+
+// Delete a product
+exports.deleteProduct = async (req, res) => {
+  const { productId } = req.params;
+
+  try {
+    const product = await Product.findByIdAndDelete(productId);
+    if (!product) return res.status(404).json({ error: "Product not found" });
+
+    res.json({ message: "Product deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error deleting product" });
+  }
+};
