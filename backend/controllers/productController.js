@@ -1,29 +1,29 @@
 const Order = require("../models/Order");
 const Product = require("../models/Product");
+const Store = require("../models/Store");
 
 exports.createProduct = async (req, res) => {
+  const vendor = req.user._id;
+
+  const store = await Store.findOne({ owner: vendor });
+
+  if (!store) {
+    console.log("Store not found");
+    return res.status(404).json({ message: "Store not found" });
+  }
+
   try {
-    const {
-      name,
-      description,
-      price,
-      category,
-      subcategory,
-      image,
-      stock,
-      sizes,
-      store,
-    } = req.body;
+    const { name, description, price, category, image, sizes } = req.body;
     const product = new Product({
       name,
       description,
       price,
       category,
-      subcategory,
+      subcategory: category,
       image,
-      stock,
+      stock: 0,
       sizes,
-      store,
+      store: store._id,
     });
     await product.save();
     res.status(201).json(product);

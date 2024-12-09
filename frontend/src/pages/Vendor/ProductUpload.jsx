@@ -1,4 +1,7 @@
 import React, { useState } from "react";
+import axios from "axios";
+import CryptoJS from "crypto-js"; // Import crypto-js
+import axiosInstance from "../../Utils/axiosInstance";
 
 const ProductUpload = () => {
   const [productData, setProductData] = useState({
@@ -11,6 +14,7 @@ const ProductUpload = () => {
   });
 
   const [sizeInput, setSizeInput] = useState("");
+  const [uploading, setUploading] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -27,13 +31,54 @@ const ProductUpload = () => {
     }
   };
 
-  const handleImageUpload = (e) => {
+  // Use crypto-js to generate the signature
+  const generateSignature = (timestamp) => {
+    const secret = "a03kJ1ZRWvLd8vtTLudw1GgSjzc"; // Replace with your Cloudinary API secret
+    const signature = CryptoJS.SHA256(
+      `timestamp=${timestamp}${secret}`
+    ).toString(CryptoJS.enc.Hex);
+    return signature;
+  };
+
+  const uploadImageToCloudinary = async (file) => {
+    const timestamp = Math.round(new Date().getTime() / 1000);
+    const signature = generateSignature(timestamp);
+
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("timestamp", timestamp);
+    formData.append("api_key", "637863784332337"); // Replace with your Cloudinary API key
+    formData.append("signature", signature);
+
+    try {
+      const response = await axios.post(
+        "https://api.cloudinary.com/v1_1/di4amvhth/image/upload", // Replace with your Cloudinary URL
+        formData
+      );
+      return response.data.secure_url;
+    } catch (error) {
+      console.error("Error uploading image: ", error);
+      return null;
+    }
+  };
+
+  const handleImageUpload = async (e) => {
     const files = Array.from(e.target.files);
-    const imagePreviews = files.map((file) => URL.createObjectURL(file));
+    setUploading(true);
+
+    const imageUrls = await Promise.all(
+      files.map(async (file) => {
+        const url = await uploadImageToCloudinary(file);
+        return url;
+      })
+    );
+
     setProductData({
       ...productData,
-      images: [...productData.images, ...imagePreviews],
+      images: [...productData.images, ...imageUrls.filter((url) => url)],
     });
+
+    setUploading(false);
   };
 
   const handleRemoveImage = (index) => {
@@ -44,6 +89,16 @@ const ProductUpload = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Submitted product data: ", productData);
+    // Send productData to your backend here
+    axiosInstance.post("/products", {
+      name: productData.name,
+      description: productData.description,
+      price: productData.price,
+      category: productData.category,
+      sizes: productData.sizes,
+      image: productData.images[0],
+    });
+
     // Clear form after submission
     setProductData({
       name: "",
@@ -94,10 +149,9 @@ const ProductUpload = () => {
                 <option value="" disabled>
                   Select a category
                 </option>
-                <option value="Clothing">Clothing</option>
-                <option value="Electronics">Electronics</option>
-                <option value="Home Appliances">Home Appliances</option>
-                <option value="Accessories">Accessories</option>
+                <option value="Women">Women</option>
+                <option value="Men">Men</option>
+                <option value="Kids">Kids</option>
               </select>
             </div>
             <div>
@@ -172,7 +226,6 @@ const ProductUpload = () => {
             <div className="mt-2">
               <input
                 type="file"
-                multiple
                 onChange={handleImageUpload}
                 className="block w-full text-xs sm:text-sm text-gray-500 
                 file:mr-2 sm:file:mr-4 
@@ -183,6 +236,7 @@ const ProductUpload = () => {
                 hover:file:bg-blue-100"
               />
             </div>
+            {uploading && <p>Uploading images...</p>}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4 mt-4">
               {productData.images.map((image, index) => (
                 <div key={index} className="relative">

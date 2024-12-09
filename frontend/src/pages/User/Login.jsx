@@ -1,7 +1,7 @@
 import { useState } from "react";
 import authService from "../../Utils/authService";
 import { navigateByRole } from "../../Utils/authGuard";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [currentState, setCurrentState] = useState("Sign Up");
@@ -78,12 +78,17 @@ const Login = () => {
             Create Account
           </p>
         ) : (
-          <p
-            onClick={() => setCurrentState("Login")}
-            className="cursor-pointer"
-          >
-            Login Here
-          </p>
+          <>
+            <p
+              onClick={() => setCurrentState("Login")}
+              className="cursor-pointer"
+            >
+              Login Here
+            </p>
+            <Link to="/user/vendor-registration" className="cursor-pointer">
+              Become a Seller
+            </Link>
+          </>
         )}
       </div>
 
