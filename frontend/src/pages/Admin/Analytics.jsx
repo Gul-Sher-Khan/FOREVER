@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axiosInstance from "../../Utils/axiosInstance";
 import {
   FaUsers,
   FaDollarSign,
@@ -31,13 +32,30 @@ ChartJS.register(
 );
 
 const AnalyticsPage = () => {
-  // Sample data for charts
+  const [analytics, setAnalytics] = useState(null);
+
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        const response = await axiosInstance.get("/admin/analytics");
+        setAnalytics(response.data);
+      } catch (error) {
+        console.error("Error fetching analytics data", error);
+      }
+    };
+    fetchAnalytics();
+  }, []);
+
+  if (!analytics) {
+    return <div>Loading...</div>;
+  }
+
   const dataLineChart = {
-    labels: ["January", "February", "March", "April", "May", "June"],
+    labels: analytics.salesOverTime.map((entry) => entry._id),
     datasets: [
       {
         label: "Sales Over Time",
-        data: [30, 50, 45, 70, 90, 120],
+        data: analytics.salesOverTime.map((entry) => entry.totalSales),
         fill: false,
         borderColor: "rgba(75,192,192,1)",
         tension: 0.1,
@@ -46,11 +64,11 @@ const AnalyticsPage = () => {
   };
 
   const dataBarChart = {
-    labels: ["Product A", "Product B", "Product C", "Product D", "Product E"],
+    labels: analytics.productSalesBreakdown.map((entry) => entry._id),
     datasets: [
       {
-        label: "Product Sales",
-        data: [50, 100, 150, 200, 250],
+        label: "Product Sales Breakdown",
+        data: analytics.productSalesBreakdown.map((entry) => entry.totalSales),
         backgroundColor: "rgba(75,192,192,0.6)",
         borderColor: "rgba(75,192,192,1)",
         borderWidth: 1,
@@ -69,7 +87,6 @@ const AnalyticsPage = () => {
         </p>
       </header>
 
-      {/* Stats Section (KPIs Cards) */}
       <div className="flex flex-wrap justify-between gap-6 mb-10">
         <div className="bg-white p-6 rounded-lg shadow-xl w-full sm:w-auto">
           <div className="flex items-center gap-4">
@@ -78,7 +95,7 @@ const AnalyticsPage = () => {
               <h3 className="text-xl font-semibold text-gray-800">
                 Total Users
               </h3>
-              <p className="text-gray-600 text-3xl">1,250</p>
+              <p className="text-gray-600 text-3xl">{analytics.totalUsers}</p>
             </div>
           </div>
         </div>
@@ -88,7 +105,9 @@ const AnalyticsPage = () => {
             <FaDollarSign className="text-green-500 text-4xl" />
             <div>
               <h3 className="text-xl font-semibold text-gray-800">Revenue</h3>
-              <p className="text-gray-600 text-3xl">$30,500</p>
+              <p className="text-gray-600 text-3xl">
+                ${analytics.totalRevenue}
+              </p>
             </div>
           </div>
         </div>
@@ -100,7 +119,9 @@ const AnalyticsPage = () => {
               <h3 className="text-xl font-semibold text-gray-800">
                 Product Sales
               </h3>
-              <p className="text-gray-600 text-3xl">450</p>
+              <p className="text-gray-600 text-3xl">
+                {analytics.totalProductSales}
+              </p>
             </div>
           </div>
         </div>
@@ -112,13 +133,15 @@ const AnalyticsPage = () => {
               <h3 className="text-xl font-semibold text-gray-800">
                 Orders Processed
               </h3>
-              <p className="text-gray-600 text-3xl">1,200</p>
+              <p className="text-gray-600 text-3xl">
+                {analytics.totalOrdersProcessed}
+              </p>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Graphs Section (Charts) */}
+      {/* Graphs Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
         <div className="bg-white p-6 rounded-lg shadow-xl">
           <h3 className="text-xl font-semibold text-gray-800 mb-4">
@@ -148,7 +171,9 @@ const AnalyticsPage = () => {
                 <p className="text-xl font-semibold text-gray-800">
                   Growth Rate
                 </p>
-                <p className="text-gray-600">+25% this month</p>
+                <p className="text-gray-600">
+                  +{analytics.growthRate}% this month
+                </p>
               </div>
             </div>
           </div>
@@ -160,19 +185,21 @@ const AnalyticsPage = () => {
                 <p className="text-xl font-semibold text-gray-800">
                   Active Users
                 </p>
-                <p className="text-gray-600">+150 this week</p>
+                <p className="text-gray-600">
+                  {analytics.activeUsers} active users
+                </p>
               </div>
             </div>
           </div>
 
           <div className="bg-blue-100 p-6 rounded-lg shadow-md flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <FaArrowUp className="text-blue-500 text-3xl" />
+              <FaDollarSign className="text-blue-500 text-3xl" />
               <div>
                 <p className="text-xl font-semibold text-gray-800">
                   Sales Volume
                 </p>
-                <p className="text-gray-600">+10% this quarter</p>
+                <p className="text-gray-600">${analytics.salesVolume}</p>
               </div>
             </div>
           </div>

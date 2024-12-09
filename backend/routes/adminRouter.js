@@ -8,6 +8,7 @@ const {
   getVendorsAndStores,
   getProductsByStore,
   deleteProduct,
+  getAdminAnalytics,
 } = require("../controllers/adminController");
 
 // Route to fetch dashboard data
@@ -24,5 +25,6 @@ router.delete("/users/:id", deleteUser);
 router.get("/vendors-and-stores", getVendorsAndStores);
 router.get("/products/:storeId", getProductsByStore);
 router.delete("/product/:productId", deleteProduct);
+router.get("/analytics", getAdminAnalytics);
 
 module.exports = router;
