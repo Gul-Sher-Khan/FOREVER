@@ -8,7 +8,7 @@ export function AuthGuard() {
   const location = useLocation();
   const isAuthenticated = authService.isAuthenticated();
   const role = authService.getRole();
-  const publicPaths = ["/", "/login", "/signup"];
+  const publicPaths = ["/", "/login", "/signup", "/user/vendor-registration"];
 
   React.useEffect(() => {
     // Handle public routes

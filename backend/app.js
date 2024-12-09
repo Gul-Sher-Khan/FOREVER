@@ -20,7 +20,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", require("./routes/authRouter"));
-app.use("/api/products", requireAuth, require("./routes/productRouter"));
+app.use("/api/products", require("./routes/productRouter"));
 app.use("/api/orders", requireAuth, require("./routes/orderRouter"));
 app.use("/api/wishlist", requireAuth, require("./routes/wishlistRouter"));
 app.use("/api/vendor", requireAuth, isVendor, require("./routes/vendorRouter"));

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   FaHome,
   FaUsers,
@@ -11,6 +11,7 @@ import {
 } from "react-icons/fa";
 import { MdCategory } from "react-icons/md";
 import { FiMenu, FiX } from "react-icons/fi";
+import authService from "../../Utils/authService";
 
 const menuItems = [
   { name: "Dashboard", icon: FaHome, path: "/admin/" },
@@ -27,6 +28,7 @@ const menuItems = [
 const AdminNavbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   return (
     <nav className="bg-white border-b border-gray-200">

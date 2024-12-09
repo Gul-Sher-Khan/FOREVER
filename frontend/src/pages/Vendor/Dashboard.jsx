@@ -40,6 +40,14 @@ const Dashboard = () => {
 
   if (!dashboardData) return <div>Loading...</div>;
 
+  // Safeguard against undefined or null data
+  const monthlySales = dashboardData.monthlySales || new Array(12).fill(0); // Default to 0 if no sales
+  const categorySales = dashboardData.categorySales || {}; // Default to empty object
+  const topProducts = dashboardData.topProducts || []; // Default to empty array
+  const totalSales = dashboardData.totalSales || 0; // Default to 0 if no sales
+  const totalOrders = dashboardData.totalOrders || 0; // Default to 0 if no orders
+  const avgRating = dashboardData.avgRating || 0; // Default to 0 if no reviews
+
   const barData = {
     labels: [
       "January",
@@ -58,7 +66,7 @@ const Dashboard = () => {
     datasets: [
       {
         label: "Monthly Sales",
-        data: dashboardData.monthlySales, // Use the monthlySales array from backend
+        data: monthlySales, // Use the monthlySales array from backend
         backgroundColor: "rgba(59, 130, 246, 0.5)",
         borderColor: "rgba(59, 130, 246, 1)",
         borderWidth: 1,
@@ -67,10 +75,10 @@ const Dashboard = () => {
   };
 
   const doughnutData = {
-    labels: Object.keys(dashboardData.categorySales),
+    labels: Object.keys(categorySales), // Safeguard if categorySales is empty
     datasets: [
       {
-        data: Object.values(dashboardData.categorySales),
+        data: Object.values(categorySales), // Safeguard if categorySales is empty
         backgroundColor: [
           "rgba(34, 197, 94, 0.7)",
           "rgba(59, 130, 246, 0.7)",
@@ -100,23 +108,17 @@ const Dashboard = () => {
         {/* Analytics Cards */}
         <div className="bg-white shadow rounded-lg p-4">
           <h2 className="text-lg font-medium text-gray-800">Total Sales</h2>
-          <p className="text-3xl font-bold text-blue-600">
-            ${dashboardData.totalSales}
-          </p>
+          <p className="text-3xl font-bold text-blue-600">${totalSales}</p>
         </div>
         <div className="bg-white shadow rounded-lg p-4">
           <h2 className="text-lg font-medium text-gray-800">Total Orders</h2>
-          <p className="text-3xl font-bold text-green-600">
-            {dashboardData.totalOrders}
-          </p>
+          <p className="text-3xl font-bold text-green-600">{totalOrders}</p>
         </div>
         <div className="bg-white shadow rounded-lg p-4">
           <h2 className="text-lg font-medium text-gray-800">
             Customer Reviews
           </h2>
-          <p className="text-3xl font-bold text-pink-600">
-            {dashboardData.avgRating}/5
-          </p>
+          <p className="text-3xl font-bold text-pink-600">{avgRating}/5</p>
         </div>
       </div>
 
@@ -126,8 +128,7 @@ const Dashboard = () => {
           <h2 className="text-lg font-medium text-gray-800 mb-4">
             Monthly Sales
           </h2>
-          {dashboardData.monthlySales &&
-          dashboardData.monthlySales.some((sale) => sale > 0) ? (
+          {monthlySales.length > 0 && monthlySales.some((sale) => sale > 0) ? (
             <Bar data={barData} />
           ) : (
             <p className="text-gray-500 text-center">No Sales Yet</p>
@@ -139,9 +140,7 @@ const Dashboard = () => {
           <h2 className="text-lg font-medium text-gray-800 mb-4">
             Sales by Category
           </h2>
-          {Object.values(dashboardData.categorySales).some(
-            (sales) => sales > 0
-          ) ? (
+          {Object.values(categorySales).some((sales) => sales > 0) ? (
             <Doughnut data={doughnutData} />
           ) : (
             <p className="text-gray-500 text-center">No Sales Yet</p>
@@ -152,7 +151,7 @@ const Dashboard = () => {
       {/* Table */}
       <div className="bg-white shadow rounded-lg p-6 mt-6">
         <h2 className="text-lg font-medium text-gray-800 mb-4">Top Products</h2>
-        {dashboardData.topProducts && dashboardData.topProducts.length > 0 ? (
+        {topProducts.length > 0 ? (
           <div className="overflow-x-auto">
             <table className="w-full table-auto border-collapse border border-gray-200">
               <thead>
@@ -163,7 +162,7 @@ const Dashboard = () => {
                 </tr>
               </thead>
               <tbody className="text-gray-600 text-sm">
-                {dashboardData.topProducts.map((row) => (
+                {topProducts.map((row) => (
                   <tr
                     key={row.id}
                     className="border-b border-gray-200 hover:bg-gray-100"
@@ -185,4 +184,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-  

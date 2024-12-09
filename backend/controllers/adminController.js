@@ -301,7 +301,7 @@ exports.getAdminAnalytics = async (req, res) => {
 
     // Total Orders Processed (Completed orders count)
     const totalOrdersProcessed = await Order.countDocuments({
-      status: "completed",
+      status: "Delivered",
     });
 
     const productSalesBreakdown = await Order.aggregate([

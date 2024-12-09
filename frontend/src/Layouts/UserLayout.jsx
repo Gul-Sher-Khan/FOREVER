@@ -12,6 +12,7 @@ import Navbar from "../components/Shared/Navbar";
 import SearchBar from "../components/User/SearchBar";
 import Wishlist from "../pages/User/Wishlist";
 import ProfileManagement from "../pages/User/ProfileManagement";
+import VendorRegistration from "../pages/User/VendorRegistration";
 import { useEffect } from "react";
 import { useContext } from "react";
 import { ShopContext } from "../context/ShopContext";
@@ -54,6 +55,7 @@ const UserLayout = () => {
         <Route path="/orders" element={<Orders />} />
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/profile" element={<ProfileManagement />} />
+        <Route path="/vendor-registration" element={<VendorRegistration />} />
       </Routes>
       <Footer />
     </div>
