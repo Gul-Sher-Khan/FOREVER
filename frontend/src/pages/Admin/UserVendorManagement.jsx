@@ -1,48 +1,32 @@
-import React, { useState } from "react";
-import {
-  FaTrash,
-  FaEdit,
-  FaCheckCircle,
-  FaTimesCircle,
-  FaUser,
-  FaIndustry,
-} from "react-icons/fa";
+import React, { useState, useEffect } from "react";
+import { FaTrash, FaEdit, FaUser, FaIndustry } from "react-icons/fa";
 import { motion } from "framer-motion";
+import axiosInstance from "../../Utils/axiosInstance";
 
 const UserVendorManagement = () => {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const [showModal, setShowModal] = useState(false);
   const [modalData, setModalData] = useState(null);
 
-  const users = [
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john@example.com",
-      type: "User",
-      status: "Active",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      email: "jane@example.com",
-      type: "Vendor",
-      status: "Pending",
-    },
-    {
-      id: 3,
-      name: "Michael Lee",
-      email: "michael@example.com",
-      type: "User",
-      status: "Blocked",
-    },
-    {
-      id: 4,
-      name: "Sarah Johnson",
-      email: "sarah@example.com",
-      type: "Vendor",
-      status: "Active",
-    },
-  ];
+  // Fetch users and vendors from the backend
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await axiosInstance.get("/admin/users");
+        setUsers(response.data.users);
+        setLoading(false);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to fetch users.");
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, []);
 
   const handleAction = (user) => {
     setModalData(user);
@@ -54,19 +38,42 @@ const UserVendorManagement = () => {
     setModalData(null);
   };
 
+  const handleSaveChanges = async () => {
+    if (!modalData) return;
+
+    try {
+      await axiosInstance.put(`/admin/users/${modalData.id}`, modalData);
+      setUsers((prev) =>
+        prev.map((user) => (user.id === modalData.id ? modalData : user))
+      );
+      closeModal();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to update user.");
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`/admin/users/${id}`);
+      setUsers((prev) => prev.filter((user) => user.id !== id));
+    } catch (err) {
+      console.error(err);
+      alert("Failed to delete user.");
+    }
+  };
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <header className="mb-6">
         <h1 className="text-3xl font-bold text-gray-800">
           User & Vendor Management
         </h1>
-        <p className="text-gray-600">
-          Approve and oversee vendor accounts, monitor user activity, and handle
-          disputes.
-        </p>
       </header>
 
-      {/* User Table */}
       <div className="bg-white shadow-lg rounded-lg p-6">
         <h2 className="text-lg font-bold text-gray-800 mb-4">
           Manage Users & Vendors
@@ -76,8 +83,7 @@ const UserVendorManagement = () => {
             <tr className="border-b">
               <th className="py-2">Name</th>
               <th className="py-2">Email</th>
-              <th className="py-2">Type</th>
-              <th className="py-2">Status</th>
+              <th className="py-2">Role</th>
               <th className="py-2">Actions</th>
             </tr>
           </thead>
@@ -87,34 +93,24 @@ const UserVendorManagement = () => {
                 <td className="py-2">{user.name}</td>
                 <td className="py-2">{user.email}</td>
                 <td className="py-2 flex items-center gap-2">
-                  {user.type === "Vendor" ? (
+                  {user.role === "vendor" ? (
                     <FaIndustry className="text-purple-500" />
                   ) : (
                     <FaUser className="text-blue-500" />
                   )}
-                  {user.type}
+                  {user.role}
                 </td>
-                <td className="py-2">
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium ${
-                      user.status === "Active"
-                        ? "bg-green-100 text-green-800"
-                        : user.status === "Pending"
-                        ? "bg-yellow-100 text-yellow-800"
-                        : "bg-red-100 text-red-800"
-                    }`}
-                  >
-                    {user.status}
-                  </span>
-                </td>
-                <td className="py-2 flex gap-2">
+                <td className="space-x-2">
                   <button
                     onClick={() => handleAction(user)}
                     className="text-blue-500 hover:text-blue-700"
                   >
                     <FaEdit />
                   </button>
-                  <button className="text-red-500 hover:text-red-700">
+                  <button
+                    onClick={() => handleDelete(user.id)}
+                    className="text-red-500 hover:text-red-700"
+                  >
                     <FaTrash />
                   </button>
                 </td>
@@ -124,7 +120,6 @@ const UserVendorManagement = () => {
         </table>
       </div>
 
-      {/* Custom Modal */}
       {showModal && modalData && (
         <motion.div
           className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
@@ -134,40 +129,20 @@ const UserVendorManagement = () => {
         >
           <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
             <h2 className="text-xl font-bold text-gray-800">Manage User</h2>
-            <p className="text-gray-600 mb-4">{modalData.name}</p>
 
             <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <span className="font-medium">Email:</span>
-                <span>{modalData.email}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="font-medium">Type:</span>
-                <span>{modalData.type}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="font-medium">Status:</span>
-                <select
-                  defaultValue={modalData.status}
-                  className="block w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm focus:ring focus:ring-blue-200"
-                >
-                  <option value="Active">Active</option>
-                  <option value="Pending">Pending</option>
-                  <option value="Blocked">Blocked</option>
-                </select>
-              </div>
+              <input
+                value={modalData.name}
+                onChange={(e) =>
+                  setModalData({ ...modalData, name: e.target.value })
+                }
+              />
+              {/* Similar inputs for email and role */}
             </div>
 
             <div className="flex justify-end mt-6 gap-4">
-              <button
-                onClick={closeModal}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
-              >
-                Cancel
-              </button>
-              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                Save Changes
-              </button>
+              <button onClick={closeModal}>Cancel</button>
+              <button onClick={handleSaveChanges}>Save</button>
             </div>
           </div>
         </motion.div>

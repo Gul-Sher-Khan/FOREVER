@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   FaHome,
   FaTshirt,
@@ -25,6 +25,7 @@ const menuItems = [
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   return (
     <nav className="bg-white border-b border-gray-200">
@@ -81,6 +82,7 @@ const Navbar = () => {
                   className="flex items-center gap-2 px-4 py-3 sm:py-2 sm:px-4 text-sm rounded-lg transition-colors text-gray-600 hover:bg-gray-100"
                   onClick={() => {
                     authService.logout();
+                    navigate("/login");
                   }}
                 >
                   <FaHome className="w-4 h-4" />

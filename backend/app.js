@@ -1,7 +1,7 @@
 const express = require("express");
 const connectDB = require("./config/db.js");
 const cors = require("cors");
-const { requireAuth } = require("./middleware/auth.js");
+const { requireAuth, isAdmin, isVendor } = require("./middleware/auth.js");
 require("dotenv").config();
 
 const app = express();
@@ -23,7 +23,8 @@ app.use("/api/auth", require("./routes/authRouter"));
 app.use("/api/products", requireAuth, require("./routes/productRouter"));
 app.use("/api/orders", requireAuth, require("./routes/orderRouter"));
 app.use("/api/wishlist", requireAuth, require("./routes/wishlistRouter"));
-app.use("/api/vendor", requireAuth, require("./routes/vendorRouter"));
+app.use("/api/vendor", requireAuth, isVendor, require("./routes/vendorRouter"));
+app.use("/api/admin", requireAuth, isAdmin, require("./routes/adminRouter"));
 
 app.use((err, req, res, next) => {
   console.error(err.stack);

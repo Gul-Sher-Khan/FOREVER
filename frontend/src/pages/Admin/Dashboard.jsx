@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axiosInstance from "../../Utils/axiosInstance";
 import {
   FaShoppingCart,
   FaUser,
@@ -8,13 +9,32 @@ import {
   FaArrowDown,
 } from "react-icons/fa";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 const Dashboard = () => {
-  const topProducts = [
-    { name: "Wireless Earbuds", sales: 120, revenue: "$3,000" },
-    { name: "Smart Watch", sales: 98, revenue: "$2,200" },
-    { name: "Gaming Mouse", sales: 76, revenue: "$1,500" },
-  ];
+  const [dashboardData, setDashboardData] = useState({
+    totalRevenue: 0,
+    monthlyRevenue: 0,
+    percentageIncreaseTotalRevenue: 0,
+    percentageIncreaseActiveUsers: 0,
+    percentageIncreaseNewVendors: 0,
+    percentageIncreaseMonthlyRevenue: 0,
+    activeUsers: 0,
+    newVendors: 0,
+    topProducts: [],
+  });
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const response = await axiosInstance.get("/admin/dashboard");
+        setDashboardData(response.data);
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      }
+    };
+    fetchDashboardData();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -27,21 +47,25 @@ const Dashboard = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {/* Total Revenue Card */}
         <motion.div
           className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition-all duration-300"
           whileHover={{ scale: 1.05 }}
         >
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-medium text-gray-600">Total Sales</h2>
+            <h2 className="text-sm font-medium text-gray-600">Total Revenue</h2>
             <FaShoppingCart className="text-blue-500 text-2xl" />
           </div>
-          <p className="text-3xl font-bold text-gray-800 mt-4">$45,800</p>
+          <p className="text-3xl font-bold text-gray-800 mt-4">
+            ${dashboardData.totalRevenue}
+          </p>
           <span className="text-sm text-green-600 flex items-center mt-2">
             <FaArrowUp className="mr-1" />
-            12% Increase
+            {dashboardData.percentageIncreaseTotalRevenue} % Increase
           </span>
         </motion.div>
 
+        {/* Active Users Card */}
         <motion.div
           className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition-all duration-300"
           whileHover={{ scale: 1.05 }}
@@ -50,13 +74,16 @@ const Dashboard = () => {
             <h2 className="text-sm font-medium text-gray-600">Active Users</h2>
             <FaUser className="text-green-500 text-2xl" />
           </div>
-          <p className="text-3xl font-bold text-gray-800 mt-4">1,200</p>
-          <span className="text-sm text-red-600 flex items-center mt-2">
-            <FaArrowDown className="mr-1" />
-            5% Decrease
+          <p className="text-3xl font-bold text-gray-800 mt-4">
+            {dashboardData.activeUsers}
+          </p>
+          <span className="text-sm text-green-600 flex items-center mt-2">
+            <FaArrowUp className="mr-1" />
+            {dashboardData.percentageIncreaseActiveUsers} % Increase
           </span>
         </motion.div>
 
+        {/* Monthly Revenue Card */}
         <motion.div
           className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition-all duration-300"
           whileHover={{ scale: 1.05 }}
@@ -67,13 +94,16 @@ const Dashboard = () => {
             </h2>
             <FaChartLine className="text-orange-500 text-2xl" />
           </div>
-          <p className="text-3xl font-bold text-gray-800 mt-4">$12,300</p>
+          <p className="text-3xl font-bold text-gray-800 mt-4">
+            ${dashboardData.monthlyRevenue}
+          </p>
           <span className="text-sm text-green-600 flex items-center mt-2">
             <FaArrowUp className="mr-1" />
-            8% Increase
+            {dashboardData.percentageIncreaseMonthlyRevenue} % Increase
           </span>
         </motion.div>
 
+        {/* New Vendors Card */}
         <motion.div
           className="bg-white shadow-lg rounded-lg p-6 hover:shadow-xl transition-all duration-300"
           whileHover={{ scale: 1.05 }}
@@ -82,10 +112,12 @@ const Dashboard = () => {
             <h2 className="text-sm font-medium text-gray-600">New Vendors</h2>
             <FaTags className="text-purple-500 text-2xl" />
           </div>
-          <p className="text-3xl font-bold text-gray-800 mt-4">25</p>
+          <p className="text-3xl font-bold text-gray-800 mt-4">
+            {dashboardData.newVendors}
+          </p>
           <span className="text-sm text-green-600 flex items-center mt-2">
             <FaArrowUp className="mr-1" />
-            15% Increase
+            {dashboardData.percentageIncreaseNewVendors} % Increase
           </span>
         </motion.div>
       </div>
@@ -97,42 +129,39 @@ const Dashboard = () => {
           <thead>
             <tr>
               <th className="py-2">Product</th>
-              <th className="py-2">Sales</th>
               <th className="py-2">Revenue</th>
             </tr>
           </thead>
           <tbody>
-            {topProducts.map((product, index) => (
+            {dashboardData.topProducts.map((product, index) => (
               <tr key={index} className="border-t">
-                <td className="py-2">{product.name}</td>
-                <td className="py-2">{product.sales}</td>
-                <td className="py-2">{product.revenue}</td>
+                <td className="py-2">{product.productName}</td>
+                <td className="py-2">${product.totalRevenue}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
-
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <motion.div
           className="bg-blue-600 text-white p-6 rounded-lg shadow-lg flex items-center justify-between hover:bg-blue-700 transition-all duration-300"
           whileHover={{ scale: 1.05 }}
         >
-          <div>
+          <Link to="/admin/manage-users">
             <h3 className="text-lg font-bold">Manage Vendors</h3>
             <p className="text-sm">Approve, reject, or monitor vendors.</p>
-          </div>
+          </Link>
           <FaUser className="text-4xl" />
         </motion.div>
         <motion.div
           className="bg-green-600 text-white p-6 rounded-lg shadow-lg flex items-center justify-between hover:bg-green-700 transition-all duration-300"
           whileHover={{ scale: 1.05 }}
         >
-          <div>
+          <Link to="/analytics">
             <h3 className="text-lg font-bold">View Analytics</h3>
             <p className="text-sm">Generate detailed reports and insights.</p>
-          </div>
+          </Link>
           <FaChartLine className="text-4xl" />
         </motion.div>
       </div>
